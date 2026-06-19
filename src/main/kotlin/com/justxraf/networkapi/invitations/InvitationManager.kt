@@ -279,7 +279,7 @@ class InvitationManager<T : Invitation>(
             index(invitation)
         }
         duplicateMutation?.let {
-            applyDuplicateMutation(it, invitation)
+            applyDuplicateMutation(it, invitation, actor)
             return it.result
         }
 
@@ -294,59 +294,67 @@ class InvitationManager<T : Invitation>(
         }
 
         if (!scheduleExpiry(invitation)) return SendResult.Accepted(invitation.id)
-        fireHook(invitation, InvitationAction.SENT) { handler.onSend(it) }
+        fireHook(invitation, InvitationAction.SENT, actor = actor) { handler.onSend(it) }
         return SendResult.Accepted(invitation.id)
     }
 
     /** The invited party accepts. No-op (returns false) if the id is unknown or already consumed. */
-    fun accept(invitationId: UUID): Boolean =
-        acceptDetailed(invitationId) is AcceptResult.Accepted
+    @JvmOverloads
+    fun accept(invitationId: UUID, actor: ActorContext? = null): Boolean =
+        acceptDetailed(invitationId, actor) is AcceptResult.Accepted
 
     /**
      * Accept the invitation from [inviterId] to [invitedId] — the "accept from a name" path, where the
      * UX has the invited player name their inviter rather than quote an opaque id. No-op (returns
      * false) if no such pending invitation exists.
      */
-    fun accept(inviterId: UUID, invitedId: UUID): Boolean =
-        acceptDetailed(inviterId, invitedId) is AcceptResult.Accepted
+    @JvmOverloads
+    fun accept(inviterId: UUID, invitedId: UUID, actor: ActorContext? = null): Boolean =
+        acceptDetailed(inviterId, invitedId, actor) is AcceptResult.Accepted
 
     /** The invited party declines. No-op (returns false) if the id is unknown or already consumed. */
-    fun deny(invitationId: UUID): Boolean =
-        denyDetailed(invitationId) is DenyResult.Denied
+    @JvmOverloads
+    fun deny(invitationId: UUID, actor: ActorContext? = null): Boolean =
+        denyDetailed(invitationId, actor) is DenyResult.Denied
 
     /** The inviter revokes it. No-op (returns false) if the id is unknown or already consumed. */
-    fun cancel(invitationId: UUID): Boolean =
-        cancelDetailed(invitationId) is CancelResult.Cancelled
+    @JvmOverloads
+    fun cancel(invitationId: UUID, actor: ActorContext? = null): Boolean =
+        cancelDetailed(invitationId, actor) is CancelResult.Cancelled
 
     /**
      * Idempotent [accept]: returns [AcceptResult.Accepted] on the transition, or [AcceptResult.NotFound]
      * if the id was unknown or already consumed — so a double-click / retry is distinguishable from a
      * fresh accept rather than collapsing to `false`.
      */
-    fun acceptDetailed(invitationId: UUID): AcceptResult =
-        when (consume(invitationId, InvitationAction.ACCEPTED, startsPairCooldown = false) { handler.onAccept(it) }) {
+    @JvmOverloads
+    fun acceptDetailed(invitationId: UUID, actor: ActorContext? = null): AcceptResult =
+        when (consume(invitationId, InvitationAction.ACCEPTED, startsPairCooldown = false, actor = actor) { handler.onAccept(it) }) {
             ConsumeOutcome.CONSUMED -> AcceptResult.Accepted(invitationId)
             ConsumeOutcome.VETOED -> AcceptResult.Vetoed
             ConsumeOutcome.NOT_FOUND -> AcceptResult.NotFound
         }
 
     /** Idempotent [accept] by inviter/invited pair. See [acceptDetailed] and [accept]. */
-    fun acceptDetailed(inviterId: UUID, invitedId: UUID): AcceptResult {
+    @JvmOverloads
+    fun acceptDetailed(inviterId: UUID, invitedId: UUID, actor: ActorContext? = null): AcceptResult {
         val id = getInvite(inviterId, invitedId)?.id ?: return AcceptResult.NotFound
-        return acceptDetailed(id)
+        return acceptDetailed(id, actor)
     }
 
     /** Idempotent [deny]: see [acceptDetailed]. */
-    fun denyDetailed(invitationId: UUID): DenyResult =
-        when (consume(invitationId, InvitationAction.DENIED, startsPairCooldown = true) { handler.onDeny(it) }) {
+    @JvmOverloads
+    fun denyDetailed(invitationId: UUID, actor: ActorContext? = null): DenyResult =
+        when (consume(invitationId, InvitationAction.DENIED, startsPairCooldown = true, actor = actor) { handler.onDeny(it) }) {
             ConsumeOutcome.CONSUMED -> DenyResult.Denied(invitationId)
             ConsumeOutcome.VETOED -> DenyResult.Vetoed
             ConsumeOutcome.NOT_FOUND -> DenyResult.NotFound
         }
 
     /** Idempotent [cancel]: see [acceptDetailed]. */
-    fun cancelDetailed(invitationId: UUID): CancelResult =
-        when (consume(invitationId, InvitationAction.CANCELLED, CancelReason.REVOKED, startsPairCooldown = true) {
+    @JvmOverloads
+    fun cancelDetailed(invitationId: UUID, actor: ActorContext? = null): CancelResult =
+        when (consume(invitationId, InvitationAction.CANCELLED, CancelReason.REVOKED, startsPairCooldown = true, actor = actor) {
             handler.onCancel(it, CancelReason.REVOKED)
         }) {
             ConsumeOutcome.CONSUMED -> CancelResult.Cancelled(invitationId)
@@ -411,7 +419,7 @@ class InvitationManager<T : Invitation>(
         } ?: return CancelResult.NotFound
         cancelTimers(invitationId)
         storeRemove(invitationId)
-        fireHook(invitation, InvitationAction.CANCELLED, CancelReason.ADMIN_CLEARED) {
+        fireHook(invitation, InvitationAction.CANCELLED, CancelReason.ADMIN_CLEARED, actor = admin) {
             handler.onCancel(it, CancelReason.ADMIN_CLEARED)
         }
         return CancelResult.Cancelled(invitationId)
@@ -424,7 +432,7 @@ class InvitationManager<T : Invitation>(
      */
     @JvmOverloads
     fun adminClearAllFor(playerId: UUID, admin: ActorContext = ActorContext.ADMIN): Int =
-        clearMatching(CancelReason.ADMIN_CLEARED) { byInviter[playerId].orEmpty() + byInvited[playerId].orEmpty() }
+        clearMatching(CancelReason.ADMIN_CLEARED, actor = admin) { byInviter[playerId].orEmpty() + byInvited[playerId].orEmpty() }
 
     /**
      * Drop every invitation [playerId] is part of in either direction, firing
@@ -584,19 +592,19 @@ class InvitationManager<T : Invitation>(
 
     // --- internals ---------------------------------------------------------------------------
 
-    private fun applyDuplicateMutation(mutation: DuplicateMutation<T>, invitation: T) {
+    private fun applyDuplicateMutation(mutation: DuplicateMutation<T>, invitation: T, actor: ActorContext?) {
         cancelTimers(mutation.existing.id)
         // Atomic swap where the store supports it (the in-memory indexes were already swapped under lock).
         storeReplace(mutation.existing.id, invitation)
         if (mutation.fireCancel) {
-            fireHook(mutation.existing, InvitationAction.CANCELLED, CancelReason.DUPLICATE_REPLACED) {
+            fireHook(mutation.existing, InvitationAction.CANCELLED, CancelReason.DUPLICATE_REPLACED, actor = actor) {
                 handler.onCancel(it, CancelReason.DUPLICATE_REPLACED)
             }
         }
         // Announce the replacement as its own post-event regardless of whether onSend re-fires.
-        notifyObservers(invitation, InvitationAction.REPLACED, replacedId = mutation.existing.id)
+        notifyObservers(invitation, InvitationAction.REPLACED, replacedId = mutation.existing.id, actor = actor)
         if (scheduleExpiry(invitation) && mutation.fireSend) {
-            fireHook(invitation, InvitationAction.SENT) { handler.onSend(it) }
+            fireHook(invitation, InvitationAction.SENT, actor = actor) { handler.onSend(it) }
         }
     }
 
@@ -613,6 +621,7 @@ class InvitationManager<T : Invitation>(
         action: InvitationAction,
         cancelReason: CancelReason? = null,
         startsPairCooldown: Boolean,
+        actor: ActorContext? = null,
         hook: (T) -> Unit,
     ): ConsumeOutcome {
         // Peek without mutating so a veto can abort without having to re-index.
@@ -627,7 +636,7 @@ class InvitationManager<T : Invitation>(
         } ?: return ConsumeOutcome.NOT_FOUND
         cancelTimers(invitationId)
         storeRemove(invitationId)
-        fireHook(invitation, action, cancelReason, hook)
+        fireHook(invitation, action, cancelReason, actor, hook)
         return ConsumeOutcome.CONSUMED
     }
 
@@ -697,7 +706,13 @@ class InvitationManager<T : Invitation>(
      * by [denyAll] / [cancelAllFrom]. [ids] is snapshotted before locking, so the live index may have
      * shrunk by the time we unindex — [unindex] returning null is tolerated. Returns the count removed.
      */
-    private fun consumeAll(ids: Set<UUID>, action: InvitationAction, cancelReason: CancelReason? = null, hook: (T) -> Unit): Int {
+    private fun consumeAll(
+        ids: Set<UUID>,
+        action: InvitationAction,
+        cancelReason: CancelReason? = null,
+        actor: ActorContext? = null,
+        hook: (T) -> Unit,
+    ): Int {
         val removed = synchronized(lock) {
             ids.toList().mapNotNull { id ->
                 unindex(id)?.also { recordCooldown(it.inviterId, it.invitedId) }
@@ -706,7 +721,7 @@ class InvitationManager<T : Invitation>(
         storeRemoveAll(removed.map { it.id })
         removed.forEach { invitation ->
             cancelTimers(invitation.id)
-            fireHook(invitation, action, cancelReason, hook)
+            fireHook(invitation, action, cancelReason, actor, hook)
         }
         return removed.size
     }
@@ -716,7 +731,7 @@ class InvitationManager<T : Invitation>(
      * [InvitationHandler.onCancel] with [reason]. Shared by [clearAllFor] / [clearAsInviter] /
      * [clearAsInvited]. Returns the count cleared.
      */
-    private fun clearMatching(reason: CancelReason, select: () -> Set<UUID>): Int {
+    private fun clearMatching(reason: CancelReason, actor: ActorContext? = null, select: () -> Set<UUID>): Int {
         val cleared = synchronized(lock) {
             select().mapNotNull { id ->
                 unindex(id)?.also { recordCooldown(it.inviterId, it.invitedId) }
@@ -725,7 +740,7 @@ class InvitationManager<T : Invitation>(
         storeRemoveAll(cleared.map { it.id })
         cleared.forEach { invitation ->
             cancelTimers(invitation.id)
-            fireHook(invitation, InvitationAction.CANCELLED, reason) { handler.onCancel(it, reason) }
+            fireHook(invitation, InvitationAction.CANCELLED, reason, actor) { handler.onCancel(it, reason) }
         }
         return cleared.size
     }
@@ -819,9 +834,10 @@ class InvitationManager<T : Invitation>(
         action: InvitationAction,
         cancelReason: CancelReason? = null,
         replacedId: UUID? = null,
+        actor: ActorContext? = null,
     ) {
         if (observers.isEmpty()) return
-        val event = LifecycleEvent(invitation, action, scheduler.now(), cancelReason, replacedId)
+        val event = LifecycleEvent(invitation, action, scheduler.now(), cancelReason, replacedId, actor)
         dispatch {
             for (observer in observers) {
                 guarded(invitation, action) { observer.onEvent(event) }
@@ -850,9 +866,15 @@ class InvitationManager<T : Invitation>(
     }
 
     /** Dispatch a single handler hook on the main thread, isolated per [errorPolicy], then notify observers. */
-    private fun fireHook(invitation: T, action: InvitationAction, cancelReason: CancelReason? = null, hook: (T) -> Unit) {
+    private fun fireHook(
+        invitation: T,
+        action: InvitationAction,
+        cancelReason: CancelReason? = null,
+        actor: ActorContext? = null,
+        hook: (T) -> Unit,
+    ) {
         dispatch { guarded(invitation, action) { hook(invitation) } }
-        notifyObservers(invitation, action, cancelReason)
+        notifyObservers(invitation, action, cancelReason, actor = actor)
     }
 
     // index/unindex/findPair are only ever called while holding [lock]. The reverse-index values are

@@ -24,9 +24,10 @@ fun interface InvitationAudit {
 
 /**
  * One immutable audit record: the invitation's identity and parties, the [action] that occurred, its
- * [timestamp] (epoch millis from the scheduler clock), the invitation's own timing for context, and
- * the [cancelReason] / [replacedId] qualifiers when relevant. Flat and primitive-typed on purpose so
- * it maps cleanly onto a DB row or a JSON line without pulling in the generic invitation type.
+ * [timestamp] (epoch millis from the scheduler clock), the invitation's own timing for context, the
+ * [cancelReason] / [replacedId] qualifiers when relevant, and the optional actor/admin context that
+ * caused the transition. Flat and primitive-typed on purpose so it maps cleanly onto a DB row or a
+ * JSON line without pulling in the generic invitation type.
  */
 data class AuditEntry(
     val invitationId: UUID,
@@ -41,6 +42,10 @@ data class AuditEntry(
     val expiresAt: Long?,
     val cancelReason: CancelReason? = null,
     val replacedId: UUID? = null,
+    val actorId: UUID? = null,
+    val actorAdmin: Boolean = false,
+    val actorWorldId: UUID? = null,
+    val actorServerId: String? = null,
 ) {
     companion object {
         /** Build an entry from an observed [LifecycleEvent]. */
@@ -54,6 +59,10 @@ data class AuditEntry(
             expiresAt = event.invitation.expiresAt,
             cancelReason = event.cancelReason,
             replacedId = event.replacedId,
+            actorId = event.actor?.actorId,
+            actorAdmin = event.actor?.admin == true,
+            actorWorldId = event.actor?.worldId,
+            actorServerId = event.actor?.serverId,
         )
     }
 }

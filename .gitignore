@@ -8,3 +8,5 @@ build/
 .idea/
 .vscode/
 *.iml
+ROADMAP.md
+docs/

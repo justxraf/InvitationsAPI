@@ -209,7 +209,7 @@ module and safely adopted by IslandCore, SkyblockAPI, and future plugins.
 
 ## 6. Validation, Abuse Protection, And Permissions
 
-- [ ] Add built-in optional validation policies for common cases:
+- [x] Add built-in optional validation policies for common cases:
   self-invite prevention,
   offline target handling,
   target ignoring inviter,
@@ -218,14 +218,21 @@ module and safely adopted by IslandCore, SkyblockAPI, and future plugins.
   inviter lacks permission,
   invited lacks permission,
   world/server restrictions.
-- [ ] Add configurable rate limits per inviter, per invited player, and per pair.
-- [ ] Add cooldown memory that survives restarts when backed by a durable store, or document it as
-  runtime-only.
-- [ ] Add message keys or structured rejection codes instead of free-form rejection strings.
-- [ ] Add a typed rejection model so callers can localize messages safely.
-- [ ] Add optional permission/context object to `send`, `accept`, `deny`, and `cancel` if plugins need
-  actor-aware authorization.
-- [ ] Add admin override paths that preserve audit information.
+  (`ValidationPolicy`: self-invite, target online, ignore list, same-party, party capacity, inviter /
+  invited permission, and world/server restriction policies.)
+- [x] Add configurable rate limits per inviter, per invited player, and per pair. (`RateLimiter` plus
+  `Builder.rateLimits(...)`; admin sends bypass it.)
+- [x] Add cooldown memory that survives restarts when backed by a durable store, or document it as
+  runtime-only. (Documented runtime-only: pair cooldowns and sliding rate-limit windows live in memory
+  and reset on restart.)
+- [x] Add message keys or structured rejection codes instead of free-form rejection strings.
+  (`RejectionReason.Code` plus stable `messageKey`.)
+- [x] Add a typed rejection model so callers can localize messages safely. (`SendResult.PolicyRejected`
+  carries `RejectionReason` with fallback text and placeholder args.)
+- [x] Add optional permission/context object to `send`, `accept`, `deny`, and `cancel` if plugins need
+  actor-aware authorization. (`ActorContext` is threaded through send and terminal operations.)
+- [x] Add admin override paths that preserve audit information. (`adminCancel` / `adminClearAllFor`
+  bypass vetoes, use `ADMIN_CLEARED`, and audit actor/admin context.)
 
 ## 7. Time, Expiry, And Lifecycle Semantics
 

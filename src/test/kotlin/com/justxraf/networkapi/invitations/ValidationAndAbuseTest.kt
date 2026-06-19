@@ -100,6 +100,16 @@ class ValidationAndAbuseTest {
         assertEquals("4", r.reason.args["max"])
     }
 
+    @Test fun `same-party policy rejects with typed reason`() {
+        val m = manager {
+            validationPolicy(ValidationPolicy.notAlreadyInSameParty { x, y -> x == a && y == b })
+        }
+
+        val r = m.send(Invite(inviterId = a, invitedId = b)) as InvitationManager.SendResult.PolicyRejected
+
+        assertEquals(RejectionReason.Code.ALREADY_IN_SAME_PARTY, r.reason.code)
+    }
+
     @Test fun `permission policy uses actor context`() {
         val node = "invites.send"
         val perms = ActorContext.PermissionChecker { id, n -> id == a && n == node }
@@ -115,6 +125,29 @@ class ValidationAndAbuseTest {
             RejectionReason.Code.INVITER_LACKS_PERMISSION,
             (r as InvitationManager.SendResult.PolicyRejected).reason.code,
         )
+    }
+
+    @Test fun `invited permission and world restriction policies reject with typed reasons`() {
+        val invitedNode = "invites.receive"
+        val allowedWorld = UUID.randomUUID()
+        val perms = ActorContext.PermissionChecker { id, node -> id == b && node == invitedNode }
+        val worldBlocked = manager {
+            validationPolicy(ValidationPolicy.invitedHasPermission(invitedNode, perms))
+            validationPolicy(ValidationPolicy.worldOrServerRestriction(allowedWorlds = setOf(allowedWorld)))
+        }
+
+        val worldRejection = worldBlocked.send(
+            Invite(inviterId = a, invitedId = b),
+            ActorContext(actorId = a, worldId = UUID.randomUUID()),
+        ) as InvitationManager.SendResult.PolicyRejected
+        assertEquals(RejectionReason.Code.WORLD_OR_SERVER_RESTRICTED, worldRejection.reason.code)
+
+        val permissionBlocked = manager {
+            validationPolicy(ValidationPolicy.invitedHasPermission(invitedNode, ActorContext.PermissionChecker.NONE))
+        }
+        val permissionRejection = permissionBlocked.send(Invite(inviterId = a, invitedId = b))
+            as InvitationManager.SendResult.PolicyRejected
+        assertEquals(RejectionReason.Code.INVITED_LACKS_PERMISSION, permissionRejection.reason.code)
     }
 
     @Test fun `policies run in order and first rejection wins`() {
@@ -148,6 +181,27 @@ class ValidationAndAbuseTest {
         )
     }
 
+    @Test fun `per-invited and per-pair rate limits block independently`() {
+        val invitedLimited = manager {
+            rateLimits(perInvited = RateLimiter.Limit(max = 1, windowMillis = 1000))
+        }
+        assertInstanceOf(InvitationManager.SendResult.Accepted::class.java, invitedLimited.send(Invite(inviterId = a, invitedId = b)))
+        assertInstanceOf(
+            InvitationManager.SendResult.RateLimited::class.java,
+            invitedLimited.send(Invite(inviterId = UUID.randomUUID(), invitedId = b)),
+        )
+
+        val pairLimited = manager {
+            duplicatePolicy(DuplicatePolicy.REPLACE_EXISTING)
+            rateLimits(perPair = RateLimiter.Limit(max = 1, windowMillis = 1000))
+        }
+        assertInstanceOf(InvitationManager.SendResult.Accepted::class.java, pairLimited.send(Invite(inviterId = a, invitedId = b)))
+        assertInstanceOf(
+            InvitationManager.SendResult.RateLimited::class.java,
+            pairLimited.send(Invite(inviterId = a, invitedId = b)),
+        )
+    }
+
     @Test fun `admin send bypasses the rate limiter`() {
         val m = manager { rateLimits(perInviter = RateLimiter.Limit(max = 1, windowMillis = 1000)) }
         m.send(Invite(inviterId = a, invitedId = b))
@@ -162,6 +216,24 @@ class ValidationAndAbuseTest {
         assertTrue(RateLimiter { 0 }.isNoop())
     }
 
+    @Test fun `actor context reaches send and terminal audit entries`() {
+        val entries = mutableListOf<AuditEntry>()
+        val m = manager { audit { entries += it } }
+        val worldId = UUID.randomUUID()
+        val sentBy = ActorContext(actorId = a, worldId = worldId, serverId = "hub")
+        val acceptedBy = ActorContext(actorId = b, serverId = "islands")
+        val inv = Invite(inviterId = a, invitedId = b)
+
+        m.send(inv, sentBy)
+        m.acceptDetailed(inv.id, acceptedBy)
+
+        assertEquals(a, entries[0].actorId)
+        assertEquals(worldId, entries[0].actorWorldId)
+        assertEquals("hub", entries[0].actorServerId)
+        assertEquals(b, entries[1].actorId)
+        assertEquals("islands", entries[1].actorServerId)
+    }
+
     // --- Admin overrides -------------------------------------------------------------------
 
     @Test fun `adminCancel bypasses a veto that blocks normal cancel`() {
@@ -174,6 +246,21 @@ class ValidationAndAbuseTest {
         // admin cancel goes through
         assertInstanceOf(CancelResult.Cancelled::class.java, m.adminCancel(sent.invitationId))
         assertNull(m[sent.invitationId])
+    }
+
+    @Test fun `adminCancel records admin actor in audit`() {
+        val entries = mutableListOf<AuditEntry>()
+        val mod = UUID.randomUUID()
+        val m = manager { audit { entries += it } }
+        val sent = m.send(Invite(inviterId = a, invitedId = b)) as InvitationManager.SendResult.Accepted
+
+        m.adminCancel(sent.invitationId, ActorContext(actorId = mod, serverId = "staff", admin = true))
+
+        val cancelled = entries.single { it.action == InvitationAction.CANCELLED }
+        assertEquals(CancelReason.ADMIN_CLEARED, cancelled.cancelReason)
+        assertEquals(mod, cancelled.actorId)
+        assertEquals("staff", cancelled.actorServerId)
+        assertTrue(cancelled.actorAdmin)
     }
 
     @Test fun `adminClearAllFor clears both directions with ADMIN_CLEARED`() {
