@@ -1,10 +1,21 @@
 package com.justxraf.invitations
+/**
+ * Per-backend SQL fragments that let [SqlInvitationStore] stay dependency-free over `java.sql` while
+ * still using each database's native upsert. Built-in dialects cover [SQLITE], [MYSQL], and
+ * [POSTGRES]; supply your own to target another backend.
+ */
 interface SqlDialect {
-val textType: String
-val bigIntType: String
-fun upsertSql(table: String): String
+    /** Column type used for UUID/string columns (`TEXT`, `VARCHAR(255)`, …). */
+    val textType: String
+
+    /** Column type used for timestamp columns (`INTEGER`, `BIGINT`, …). */
+    val bigIntType: String
+
+    /** Insert-or-update statement for [table], with the six positional parameters in column order. */
+    fun upsertSql(table: String): String
 
     companion object {
+        /** SQLite dialect using `INSERT OR REPLACE`. */
         @JvmField
         val SQLITE: SqlDialect = object : SqlDialect {
             override val textType = "TEXT"
@@ -14,6 +25,7 @@ fun upsertSql(table: String): String
                     "VALUES (?, ?, ?, ?, ?, ?)"
         }
 
+        /** MySQL/MariaDB dialect using `INSERT … ON DUPLICATE KEY UPDATE`. */
         @JvmField
         val MYSQL: SqlDialect = object : SqlDialect {
             override val textType = "VARCHAR(255)"
@@ -25,6 +37,7 @@ fun upsertSql(table: String): String
                     "created_at = new.created_at, expires_at = new.expires_at, fields = new.fields"
         }
 
+        /** PostgreSQL dialect using `INSERT … ON CONFLICT (id) DO UPDATE`. */
         @JvmField
         val POSTGRES: SqlDialect = object : SqlDialect {
             override val textType = "TEXT"

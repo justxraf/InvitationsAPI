@@ -686,4 +686,104 @@ class InvitationManagerTest {
     @Test fun `Invitations between with null ttl has no expiry`() {
         assertNull(Invitations.between(a, b).expiresAt)
     }
+
+    @Test fun `requireExpiry rejects invites with no expiry`() {
+        val m = InvitationManager.builder(RecordingHandler(), FakeScheduler()).requireExpiry(true).build()
+
+        val result = m.send(TestInvite(inviterId = a, invitedId = b, expiresAt = null))
+
+        assertEquals(InvitationManager.SendResult.ExpiryRequired, result)
+        assertTrue(m.getInvitesFor(b).isEmpty())
+    }
+
+    @Test fun `requireExpiry still accepts invites that have an expiry`() {
+        val m = InvitationManager.builder(RecordingHandler(), FakeScheduler()).requireExpiry(true).build()
+        val inv = TestInvite(inviterId = a, invitedId = b, expiresAt = 5000)
+
+        assertEquals(InvitationManager.SendResult.Accepted(inv.id), m.send(inv))
+    }
+
+    @Test fun `no-expiry invites are allowed by default`() {
+        val m = InvitationManager(RecordingHandler(), FakeScheduler())
+        val inv = TestInvite(inviterId = a, invitedId = b, expiresAt = null)
+
+        assertEquals(InvitationManager.SendResult.Accepted(inv.id), m.send(inv))
+    }
+
+    @Test fun `maxExpiry rejects invites that outlive the guardrail`() {
+        val m = InvitationManager.builder(RecordingHandler(), FakeScheduler())
+            .maxExpiry(java.time.Duration.ofMillis(1000)).build()
+        // FakeScheduler starts at now = 0, so this asks for a 5000ms life against a 1000ms cap.
+        val inv = TestInvite(inviterId = a, invitedId = b, expiresAt = 5000)
+
+        val result = m.send(inv)
+
+        assertTrue(result is InvitationManager.SendResult.ExpiryTooLong)
+        assertEquals(1000L, (result as InvitationManager.SendResult.ExpiryTooLong).maxMillis)
+        assertEquals(5000L, result.requestedMillis)
+    }
+
+    @Test fun `maxExpiry accepts invites within the guardrail`() {
+        val m = InvitationManager.builder(RecordingHandler(), FakeScheduler())
+            .maxExpiry(java.time.Duration.ofMillis(5000)).build()
+        val inv = TestInvite(inviterId = a, invitedId = b, expiresAt = 1000)
+
+        assertEquals(InvitationManager.SendResult.Accepted(inv.id), m.send(inv))
+    }
+
+    @Test fun `rehydrate expires invites that lapsed during downtime`() {
+        // Simulate a row persisted before a restart whose expiry passed while the server was down.
+        val store = InvitationStore.InMemory<TestInvite>()
+        store.save(TestInvite(inviterId = a, invitedId = b, createdAt = 0, expiresAt = 1000))
+
+        val sched = FakeScheduler().also { it.advance(5000) } // "now" is well past expiry
+        val h = RecordingHandler()
+        val m = InvitationManager.builder(h, sched).store(store).build()
+
+        val stillPending = m.rehydrate()
+
+        assertEquals(0, stillPending)
+        assertTrue(m.getInvitesFor(b).isEmpty())
+        assertTrue(store.load().isEmpty())
+        assertEquals(listOf("expire"), h.events)
+    }
+
+    @Test fun `sweepExpired expires live invites whose expiry has passed`() {
+        // Drive the engine clock independently of the scheduler so the invite is live (its timer has
+        // not fired) yet already past its expiry — the exact case a periodic sweep backstops.
+        var nowMillis = 0L
+        val store = InvitationStore.InMemory<TestInvite>()
+        val h = RecordingHandler()
+        val m = InvitationManager.builder(h, FakeScheduler()).store(store).clock { nowMillis }.build()
+        val inv = TestInvite(inviterId = a, invitedId = b, expiresAt = 1000)
+        m.send(inv)
+        assertEquals(listOf("send"), h.events)
+
+        nowMillis = 2000 // expiry has passed but the scheduler timer never fired
+        val swept = m.sweepExpired()
+
+        assertEquals(1, swept)
+        assertTrue(m.getInvitesFor(b).isEmpty())
+        assertTrue(store.load().isEmpty())
+        assertEquals(listOf("send", "expire"), h.events)
+    }
+
+    @Test fun `sweepExpired leaves still-pending invites untouched`() {
+        val m = InvitationManager.builder(RecordingHandler(), FakeScheduler()).build()
+        val inv = TestInvite(inviterId = a, invitedId = b, expiresAt = 10_000)
+        m.send(inv)
+
+        assertEquals(0, m.sweepExpired())
+        assertEquals(listOf(inv), m.getInvitesFor(b))
+    }
+
+    @Test fun `loadExpired returns only expired rows`() {
+        val store = InvitationStore.InMemory<TestInvite>()
+        val expired = TestInvite(inviterId = a, invitedId = b, expiresAt = 500)
+        val pending = TestInvite(inviterId = a, invitedId = c, expiresAt = 5000)
+        val permanent = TestInvite(inviterId = b, invitedId = c, expiresAt = null)
+        store.save(expired); store.save(pending); store.save(permanent)
+
+        assertEquals(setOf(expired.id), store.loadExpired(1000).map { it.id }.toSet())
+    }
 }

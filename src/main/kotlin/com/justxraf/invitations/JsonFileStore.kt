@@ -11,6 +11,20 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+/**
+ * File-backed [InvitationStore] for single-process deployments, with no external dependencies. Holds
+ * the live set in memory and writes a full snapshot on every change via a temp-file + atomic NIO move,
+ * so a crash is unlikely to leave a half-written file. All I/O is UTF-8.
+ *
+ * On startup a corrupt file is moved aside to `<name>.corrupt-<timestamp>` and the store starts empty
+ * (when [recoverFromCorruption] is true); set it false to fail loudly with an [IOException] instead.
+ *
+ * @param file the JSON data file.
+ * @param serializer converts invitations to/from the flat field maps written to disk.
+ * @param recoverFromCorruption quarantine-and-continue (true) vs. throw (false) on a corrupt file.
+ * @param lockFile when true, acquire an exclusive OS file lock for the store's lifetime, enforcing
+ *   single-process ownership; the lock is released on [close].
+ */
 class JsonFileStore<T : Invitation> @JvmOverloads constructor(
     private val file: File,
     private val serializer: InvitationSerializer<T>,

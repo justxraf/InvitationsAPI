@@ -1,14 +1,26 @@
 package com.justxraf.invitations
 
 import java.util.UUID
+/**
+ * Audit sink for production debugging and compliance: a flat record of who invited whom, the outcome,
+ * reason, and timestamps. Wired through [AuditObserver]; persist entries to a log, table, or SIEM.
+ */
 fun interface InvitationAudit {
+    /** Persist a single audit record. */
     fun record(entry: AuditEntry)
 
     companion object {
-@JvmField
+        /** Audit sink that discards everything. The default. */
+        @JvmField
         val Noop: InvitationAudit = InvitationAudit { }
     }
 }
+
+/**
+ * Flattened, self-contained audit record for one lifecycle transition. Unlike [LifecycleEvent] it
+ * carries no generic payload and inlines the [ActorContext] fields, so it serializes trivially. Build
+ * one from an event with [from].
+ */
 data class AuditEntry(
     val invitationId: UUID,
     val inviterId: UUID,
@@ -25,7 +37,8 @@ val expiresAt: Long?,
     val actorServerId: String? = null,
 ) {
     companion object {
-fun <T : Invitation> from(event: LifecycleEvent<T>): AuditEntry = AuditEntry(
+        /** Flatten a [LifecycleEvent] (and its optional actor) into an [AuditEntry]. */
+        fun <T : Invitation> from(event: LifecycleEvent<T>): AuditEntry = AuditEntry(
             invitationId = event.invitation.id,
             inviterId = event.invitation.inviterId,
             invitedId = event.invitation.invitedId,
@@ -42,6 +55,7 @@ fun <T : Invitation> from(event: LifecycleEvent<T>): AuditEntry = AuditEntry(
         )
     }
 }
+/** [InvitationObserver] that converts each lifecycle event to an [AuditEntry] and records it. */
 class AuditObserver<T : Invitation>(private val audit: InvitationAudit) : InvitationObserver<T> {
     override fun onEvent(event: LifecycleEvent<T>) = audit.record(AuditEntry.from(event))
 }

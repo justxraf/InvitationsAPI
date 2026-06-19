@@ -2,9 +2,17 @@ package com.justxraf.invitations
 
 import java.sql.Connection
 import java.sql.SQLException
+/**
+ * Forward-only schema migrator for [SqlInvitationStore]. Tracks the applied version in a `<table>_meta`
+ * row and applies each pending [Step] transactionally. [SqlInvitationStore] runs [migrate] on
+ * construction, so it is safe (and idempotent) to call on every startup.
+ */
 object SqlMigrations {
-const val LATEST: Int = 1
-class Step(val version: Int, val ddl: (table: String, dialect: SqlDialect) -> List<String>)
+    /** The newest schema version this build knows how to produce. */
+    const val LATEST: Int = 1
+
+    /** One migration step: its target [version] and the DDL to reach it for a given table/dialect. */
+    class Step(val version: Int, val ddl: (table: String, dialect: SqlDialect) -> List<String>)
 
     private val steps: List<Step> = listOf(
         Step(1) { table, dialect ->
@@ -26,6 +34,7 @@ class Step(val version: Int, val ddl: (table: String, dialect: SqlDialect) -> Li
         },
     )
 
+    /** Bring [table] up to [LATEST], applying only steps newer than the recorded version. */
     fun migrate(conn: Connection, dialect: SqlDialect, table: String) {
         val metaTable = "${table}_meta"
         val previousAutoCommit = conn.autoCommit

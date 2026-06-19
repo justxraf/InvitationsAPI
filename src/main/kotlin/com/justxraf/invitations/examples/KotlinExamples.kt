@@ -47,6 +47,8 @@ fun send(manager: InvitationManager<BasicInvitation>, inviter: UUID, invited: UU
             is InvitationManager.SendResult.LimitReached -> { /* result.limit */ }
             is InvitationManager.SendResult.CooldownActive -> { /* result.remainingMillis */ }
             InvitationManager.SendResult.SelfInvite -> { /* inviter invited themselves */ }
+            InvitationManager.SendResult.ExpiryRequired -> { /* requireExpiry is on; invite had no expiry */ }
+            is InvitationManager.SendResult.ExpiryTooLong -> { /* result.maxMillis / result.requestedMillis */ }
             InvitationManager.SendResult.Vetoed -> { /* blocked by a veto / cancelled event */ }
             is InvitationManager.SendResult.StoreFailure -> { /* result.cause — persistence rejected it */ }
         }

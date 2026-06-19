@@ -1,4 +1,9 @@
 package com.justxraf.invitations
+/**
+ * Minimal, dependency-free JSON-ish codec for flat string→string field maps. Shared by
+ * [JsonFileStore] and the SQL `fields` blob so the core needs no kotlinx.serialization/Jackson.
+ * Internal: not part of the public API.
+ */
 internal object FieldCodec {
 
     fun encode(fields: Map<String, String>): String =

@@ -257,6 +257,38 @@ class ValidationAndAbuseTest {
         assertEquals(CancelReason.ADMIN_CLEARED, lastReason)
     }
 
+    @Test fun `pair cooldown blocks a re-send within the window`() {
+        val sched = ClockScheduler()
+        val m = manager(sched) { pairCooldownMillis(1000) }
+        val sent = m.send(Invite(inviterId = a, invitedId = b)) as InvitationManager.SendResult.Accepted
+        m.cancelDetailed(sent.invitationId)
+        val blocked = m.send(Invite(inviterId = a, invitedId = b))
+        assertEquals(1000, assertInstanceOf(InvitationManager.SendResult.CooldownActive::class.java, blocked).remainingMillis)
+        sched.advance(1000)
+        assertInstanceOf(InvitationManager.SendResult.Accepted::class.java, m.send(Invite(inviterId = a, invitedId = b)))
+    }
+
+    @Test fun `pair cooldown is runtime-only and does not survive a fresh manager over the same store`() {
+        val store = InvitationStore.InMemory<Invite>()
+        val sched = ClockScheduler()
+        val first = InvitationManager.builder(handler, sched)
+            .selfInvitePolicy(SelfInvitePolicy.ALLOW).store(store).pairCooldownMillis(1000).build()
+        val sent = first.send(Invite(inviterId = a, invitedId = b)) as InvitationManager.SendResult.Accepted
+        first.cancelDetailed(sent.invitationId)
+        assertInstanceOf(
+            InvitationManager.SendResult.CooldownActive::class.java,
+            first.send(Invite(inviterId = a, invitedId = b)),
+        )
+        // A new manager rehydrating the same store starts with no cooldown memory — by design.
+        val second = InvitationManager.builder(handler, sched)
+            .selfInvitePolicy(SelfInvitePolicy.ALLOW).store(store).pairCooldownMillis(1000).build()
+        second.rehydrate()
+        assertInstanceOf(
+            InvitationManager.SendResult.Accepted::class.java,
+            second.send(Invite(inviterId = a, invitedId = b)),
+        )
+    }
+
     @Test fun `legacy validate still rejects after policies pass`() {
         val h = object : InvitationHandler<Invite> {
             override fun validate(invitation: Invite, existing: List<Invite>): String? = "nope"

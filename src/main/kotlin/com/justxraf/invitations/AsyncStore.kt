@@ -4,6 +4,17 @@ import java.util.UUID
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
+/**
+ * Write-behind [InvitationStore] wrapper for plugins that must never block the server thread on I/O.
+ * Writes ([save]/[remove]/[removeAll]/[replace]) are queued and applied in order on a single daemon
+ * worker; reads ([load]) and [flush] are synchronous and first drain the queue, so they observe all
+ * prior writes. [close] drains the remaining queue then closes the delegate. Write errors are routed
+ * to [onError] rather than thrown to the caller.
+ *
+ * @param delegate the real store the worker writes through to.
+ * @param onError invoked for any exception thrown by a queued write.
+ * @param threadName name for the worker thread.
+ */
 class AsyncStore<T : Invitation> @JvmOverloads constructor(
     private val delegate: InvitationStore<T>,
     private val onError: (Throwable) -> Unit = {},
@@ -28,7 +39,8 @@ class AsyncStore<T : Invitation> @JvmOverloads constructor(
     override fun remove(id: UUID) { enqueue(Remove(id)) }
     override fun removeAll(ids: Collection<UUID>) { if (ids.isNotEmpty()) enqueue(RemoveAll(ids.toList())) }
     override fun replace(old: UUID, new: T) { enqueue(Replace(old, new)) }
-fun flush() {
+    /** Block until every write queued so far has been applied to the delegate. */
+    fun flush() {
         if (!running) return
         val done = CountDownLatch(1)
         queue.add(Flush(done))

@@ -3,6 +3,11 @@ package com.justxraf.invitations.bukkit
 import com.justxraf.invitations.Scheduler
 import org.bukkit.Bukkit
 import org.bukkit.plugin.Plugin
+/**
+ * [Scheduler] backed by Bukkit's classic main-thread scheduler. Runs main-thread work immediately
+ * when already on the primary thread, and converts millisecond delays to ticks (rounding up, min 1)
+ * for [runLater]. Use [FoliaScheduler] on Folia instead.
+ */
 class BukkitScheduler(private val plugin: Plugin) : Scheduler {
 
     override fun runOnMainThread(block: () -> Unit) {

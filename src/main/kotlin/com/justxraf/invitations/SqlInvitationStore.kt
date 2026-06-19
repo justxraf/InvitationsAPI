@@ -3,6 +3,19 @@ package com.justxraf.invitations
 import java.sql.Connection
 import java.sql.SQLException
 import java.util.UUID
+/**
+ * JDBC-backed [InvitationStore], dependency-free over `java.sql`. Each invitation is one row with the
+ * core columns (`id`, `inviter_id`, `invited_id`, `created_at`, `expires_at`) plus a serialized
+ * `fields` blob produced by [InvitationSerializer]/[FieldCodec], so subtype payload survives without a
+ * schema change. The schema is created/upgraded by [SqlMigrations] on construction.
+ *
+ * @param connections supplies a JDBC [Connection] per operation; with a pool, return a pooled one.
+ * @param serializer converts invitations to/from the flat field map stored in the `fields` column.
+ * @param dialect backend-specific SQL (upsert, column types); see [SqlDialect].
+ * @param table table name; validated against an identifier pattern since it is interpolated into SQL.
+ * @param closesConnections whether to `close()` each connection after use — `false` for pooled setups
+ *   that manage their own lifecycle.
+ */
 class SqlInvitationStore<T : Invitation> @JvmOverloads constructor(
     private val connections: () -> Connection,
     private val serializer: InvitationSerializer<T>,
@@ -19,6 +32,17 @@ class SqlInvitationStore<T : Invitation> @JvmOverloads constructor(
 
     override fun load(): List<T> = withConnection { conn ->
         conn.prepareStatement("SELECT fields FROM $table").use { ps ->
+            ps.executeQuery().use { rs ->
+                buildList {
+                    while (rs.next()) add(serializer.deserialize(FieldCodec.decode(rs.getString(1))))
+                }
+            }
+        }
+    }
+
+    override fun loadExpired(nowMillis: Long): List<T> = withConnection { conn ->
+        conn.prepareStatement("SELECT fields FROM $table WHERE expires_at IS NOT NULL AND expires_at <= ?").use { ps ->
+            ps.setLong(1, nowMillis)
             ps.executeQuery().use { rs ->
                 buildList {
                     while (rs.next()) add(serializer.deserialize(FieldCodec.decode(rs.getString(1))))

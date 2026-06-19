@@ -1,20 +1,34 @@
 package com.justxraf.invitations
 
 import java.util.concurrent.atomic.AtomicLong
+/**
+ * Counter sink for production monitoring. Lifecycle transitions arrive via [increment] (wired through
+ * [MetricsObserver]); non-transition send outcomes (duplicate, rejected, limit, cooldown, self-invite,
+ * rate-limited) via [recordSendOutcome]; and persistence errors via [recordStoreFailure]. Plug in your
+ * own implementation to forward to Prometheus/Micrometer, or use [InMemory] for a snapshot.
+ */
 interface InvitationMetrics {
-fun increment(action: InvitationAction)
-fun recordSendOutcome(result: InvitationManager.SendResult)
-fun recordStoreFailure()
+    /** Record one occurrence of a successful lifecycle [action]. */
+    fun increment(action: InvitationAction)
+
+    /** Record a non-transition send outcome (only the failure/duplicate cases are counted). */
+    fun recordSendOutcome(result: InvitationManager.SendResult)
+
+    /** Record a store write/read failure. */
+    fun recordStoreFailure()
 
     companion object {
-@JvmField
+        /** Metrics sink that discards everything. The default. */
+        @JvmField
         val Noop: InvitationMetrics = object : InvitationMetrics {
             override fun increment(action: InvitationAction) {}
             override fun recordSendOutcome(result: InvitationManager.SendResult) {}
             override fun recordStoreFailure() {}
         }
     }
-class InMemory : InvitationMetrics {
+
+    /** Thread-safe atomic-counter implementation that exposes a consistent [snapshot]. */
+    class InMemory : InvitationMetrics {
         private val counters = InvitationAction.entries.associateWith { AtomicLong() }
         private val duplicate = AtomicLong()
         private val rejected = AtomicLong()
@@ -40,7 +54,8 @@ class InMemory : InvitationMetrics {
         }
 
         override fun recordStoreFailure() { storeFailures.incrementAndGet() }
-fun snapshot(): Snapshot = Snapshot(
+        /** Take a point-in-time copy of all counters. */
+        fun snapshot(): Snapshot = Snapshot(
             sent = counters.getValue(InvitationAction.SENT).get(),
             accepted = counters.getValue(InvitationAction.ACCEPTED).get(),
             denied = counters.getValue(InvitationAction.DENIED).get(),
@@ -56,6 +71,7 @@ fun snapshot(): Snapshot = Snapshot(
             storeFailures = storeFailures.get(),
         )
 
+        /** Immutable copy of every counter at the moment [snapshot] was called. */
         data class Snapshot(
             val sent: Long,
             val accepted: Long,
@@ -73,6 +89,7 @@ fun snapshot(): Snapshot = Snapshot(
         )
     }
 }
+/** [InvitationObserver] that increments [InvitationMetrics] on each lifecycle transition. */
 class MetricsObserver<T : Invitation>(private val metrics: InvitationMetrics) : InvitationObserver<T> {
     override fun onEvent(event: LifecycleEvent<T>) = metrics.increment(event.action)
 }
