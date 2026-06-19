@@ -32,7 +32,7 @@ dependencies {
 
 application {
     // `./gradlew run` executes the server-free demonstration.
-    mainClass.set("com.justxraf.networkapi.invitations.demo.DemoKt")
+    mainClass.set("com.justxraf.invitations.demo.DemoKt")
 }
 
 kotlin {
