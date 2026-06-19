@@ -86,7 +86,7 @@ fun main() {
     val scheduler = ImmediateScheduler()
     val alice = UUID.randomUUID(); val bob = UUID.randomUUID(); val carol = UUID.randomUUID()
 
-    println("=== Island invites (IslandCore-style) ===")
+    println("=== Island invites ===")
     val islands = InvitationManager(IslandInviteHandler(), scheduler, maxPerInviter = 2)
 
     val r1 = islands.send(IslandInvite(UUID.randomUUID(), alice, bob, "Alice", "Bob", 42, IslandInviteType.MEMBER))
@@ -109,7 +109,7 @@ fun main() {
     println("\n=== clearFor (e.g. Alice logs off) ===")
     println("  cleared ${islands.clearFor(alice)} of Alice's invites")
 
-    println("\n=== Teleport requests (SkyblockAPI-style) — SAME engine ===")
+    println("\n=== Teleport requests ===")
     val teleports = InvitationManager(TeleportHandler(), scheduler)
     val t1 = teleports.send(TeleportRequest(UUID.randomUUID(), bob, alice, "Bob", "Alice"))
     println("  send -> $t1")
