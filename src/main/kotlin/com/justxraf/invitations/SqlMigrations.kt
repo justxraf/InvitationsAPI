@@ -51,10 +51,16 @@ object SqlMigrations {
             }
             conn.commit()
         } catch (t: Throwable) {
-            try { conn.rollback() } catch (_: SQLException) {}
+            try {
+                conn.rollback()
+            } catch (_: SQLException) {
+            }
             throw t
         } finally {
-            try { conn.autoCommit = previousAutoCommit } catch (_: SQLException) {}
+            try {
+                conn.autoCommit = previousAutoCommit
+            } catch (_: SQLException) {
+            }
         }
     }
 

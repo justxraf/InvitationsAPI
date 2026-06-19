@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.nio.file.Path
 import java.util.UUID
@@ -64,7 +64,9 @@ class PersistenceDurabilityTest {
     @Test fun `FAIL_BEFORE_MUTATING rolls the index back on a store failure`() {
         val store = FlakyStore<DurInvite>().apply { failSaves = true }
         val m = InvitationManager(
-            object : InvitationHandler<DurInvite> {}, immediateScheduler, store = store,
+            object : InvitationHandler<DurInvite> {},
+            immediateScheduler,
+            store = store,
             storeFailurePolicy = StoreFailurePolicy.FAIL_BEFORE_MUTATING,
         )
         val result = m.send(invite())
@@ -76,8 +78,11 @@ class PersistenceDurabilityTest {
     @Test fun `MUTATE_THEN_RETRY keeps the invite in memory and retries the write`() {
         val store = FlakyStore<DurInvite>().apply { failSaves = true }
         val m = InvitationManager(
-            object : InvitationHandler<DurInvite> {}, immediateScheduler, store = store,
-            storeFailurePolicy = StoreFailurePolicy.MUTATE_THEN_RETRY, storeWriteRetries = 2,
+            object : InvitationHandler<DurInvite> {},
+            immediateScheduler,
+            store = store,
+            storeFailurePolicy = StoreFailurePolicy.MUTATE_THEN_RETRY,
+            storeWriteRetries = 2,
         )
         val result = m.send(invite())
         assertInstanceOf(InvitationManager.SendResult.Accepted::class.java, result)
@@ -89,8 +94,11 @@ class PersistenceDurabilityTest {
     @Test fun `MARK_UNHEALTHY flips health when the store keeps failing`() {
         val store = FlakyStore<DurInvite>().apply { failSaves = true }
         val m = InvitationManager(
-            object : InvitationHandler<DurInvite> {}, immediateScheduler, store = store,
-            storeFailurePolicy = StoreFailurePolicy.MARK_UNHEALTHY, storeWriteRetries = 1,
+            object : InvitationHandler<DurInvite> {},
+            immediateScheduler,
+            store = store,
+            storeFailurePolicy = StoreFailurePolicy.MARK_UNHEALTHY,
+            storeWriteRetries = 1,
         )
         m.send(invite())
         assertFalse(m.isHealthy())
@@ -98,8 +106,11 @@ class PersistenceDurabilityTest {
 
     private fun manager(store: InvitationStore<DurInvite>, policy: RehydratePolicy, maxPerInviter: Int? = null) =
         InvitationManager(
-            object : InvitationHandler<DurInvite> {}, immediateScheduler,
-            maxPerInviter = maxPerInviter, store = store, rehydratePolicy = policy,
+            object : InvitationHandler<DurInvite> {},
+            immediateScheduler,
+            maxPerInviter = maxPerInviter,
+            store = store,
+            rehydratePolicy = policy,
         )
 
     @Test fun `REPAIR drops a duplicate pair keeping the newest and heals the store`() {
@@ -148,7 +159,9 @@ class PersistenceDurabilityTest {
         assertEquals(2, store.load().size, "DROP_INVALID must not repair the store")
     }
 
-    @Test fun `a corrupt json file is quarantined and the store starts empty`(@TempDir dir: Path) {
+    @Test fun `a corrupt json file is quarantined and the store starts empty`(
+        @TempDir dir: Path,
+    ) {
         val file = File(dir.toFile(), "invites.json")
         file.writeText("this is not json {{{")
         val store = JsonFileStore(file, DurSerializer, lockFile = false)
@@ -158,7 +171,9 @@ class PersistenceDurabilityTest {
         store.close()
     }
 
-    @Test fun `recoverFromCorruption=false throws on a corrupt file`(@TempDir dir: Path) {
+    @Test fun `recoverFromCorruption=false throws on a corrupt file`(
+        @TempDir dir: Path,
+    ) {
         val file = File(dir.toFile(), "invites.json")
         file.writeText("garbage")
         assertThrows(java.io.IOException::class.java) {
@@ -166,7 +181,9 @@ class PersistenceDurabilityTest {
         }
     }
 
-    @Test fun `a second JsonFileStore over the same locked file is rejected`(@TempDir dir: Path) {
+    @Test fun `a second JsonFileStore over the same locked file is rejected`(
+        @TempDir dir: Path,
+    ) {
         val file = File(dir.toFile(), "invites.json")
         val first = JsonFileStore(file, DurSerializer, lockFile = true)
         assertThrows(IllegalStateException::class.java) {
@@ -176,7 +193,9 @@ class PersistenceDurabilityTest {
         JsonFileStore(file, DurSerializer, lockFile = true).close()
     }
 
-    @Test fun `JsonFileStore replace and removeAll round-trip`(@TempDir dir: Path) {
+    @Test fun `JsonFileStore replace and removeAll round-trip`(
+        @TempDir dir: Path,
+    ) {
         val file = File(dir.toFile(), "invites.json")
         val store = JsonFileStore(file, DurSerializer, lockFile = false)
         val a = invite(); val b = invite(); val c = invite()

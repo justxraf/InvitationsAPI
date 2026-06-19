@@ -86,9 +86,12 @@ class SqlInvitationStore<T : Invitation> @JvmOverloads constructor(
             upsert(conn, new)
         }
     }
-override fun close() {
+    override fun close() {
         if (!closesConnections) {
-            try { connections().close() } catch (_: SQLException) {}
+            try {
+                connections().close()
+            } catch (_: SQLException) {
+            }
         }
     }
 
@@ -122,10 +125,16 @@ override fun close() {
             block(conn)
             conn.commit()
         } catch (t: Throwable) {
-            try { conn.rollback() } catch (_: SQLException) {}
+            try {
+                conn.rollback()
+            } catch (_: SQLException) {
+            }
             throw t
         } finally {
-            try { conn.autoCommit = previousAutoCommit } catch (_: SQLException) {}
+            try {
+                conn.autoCommit = previousAutoCommit
+            } catch (_: SQLException) {
+            }
             if (closesConnections) conn.close()
         }
     }

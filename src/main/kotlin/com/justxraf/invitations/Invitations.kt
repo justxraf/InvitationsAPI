@@ -26,6 +26,7 @@ object Invitations {
     @JvmStatic
     @JvmOverloads
     fun expiresAfter(ttl: Duration?, now: Long = System.currentTimeMillis()): Long? = expiresAt(ttl, now)
+
     /**
      * Build a [BasicInvitation] between two players with a generated id and computed expiry.
      *

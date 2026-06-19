@@ -1,0 +1,1155 @@
+public abstract interface class com/justxraf/invitations/AcceptResult : com/justxraf/invitations/TerminalResult {
+}
+
+public final class com/justxraf/invitations/AcceptResult$Accepted : com/justxraf/invitations/AcceptResult {
+	public fun <init> (Ljava/util/UUID;)V
+	public final fun component1 ()Ljava/util/UUID;
+	public final fun copy (Ljava/util/UUID;)Lcom/justxraf/invitations/AcceptResult$Accepted;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/AcceptResult$Accepted;Ljava/util/UUID;ILjava/lang/Object;)Lcom/justxraf/invitations/AcceptResult$Accepted;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getInvitationId ()Ljava/util/UUID;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/AcceptResult$DefaultImpls {
+	public static fun getInvitationId (Lcom/justxraf/invitations/AcceptResult;)Ljava/util/UUID;
+}
+
+public final class com/justxraf/invitations/AcceptResult$NotFound : com/justxraf/invitations/AcceptResult {
+	public static final field INSTANCE Lcom/justxraf/invitations/AcceptResult$NotFound;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getInvitationId ()Ljava/util/UUID;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/AcceptResult$Vetoed : com/justxraf/invitations/AcceptResult {
+	public static final field INSTANCE Lcom/justxraf/invitations/AcceptResult$Vetoed;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getInvitationId ()Ljava/util/UUID;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/ActorContext {
+	public static final field ADMIN Lcom/justxraf/invitations/ActorContext;
+	public static final field Companion Lcom/justxraf/invitations/ActorContext$Companion;
+	public fun <init> ()V
+	public fun <init> (Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext$PermissionChecker;Ljava/util/UUID;Ljava/lang/String;Z)V
+	public synthetic fun <init> (Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext$PermissionChecker;Ljava/util/UUID;Ljava/lang/String;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getActorId ()Ljava/util/UUID;
+	public final fun getAdmin ()Z
+	public final fun getPermissions ()Lcom/justxraf/invitations/ActorContext$PermissionChecker;
+	public final fun getServerId ()Ljava/lang/String;
+	public final fun getWorldId ()Ljava/util/UUID;
+	public final fun has (Ljava/lang/String;)Z
+	public final fun hasOrAdmin (Ljava/lang/String;)Z
+}
+
+public final class com/justxraf/invitations/ActorContext$Companion {
+}
+
+public abstract interface class com/justxraf/invitations/ActorContext$PermissionChecker {
+	public static final field Companion Lcom/justxraf/invitations/ActorContext$PermissionChecker$Companion;
+	public static final field NONE Lcom/justxraf/invitations/ActorContext$PermissionChecker;
+	public abstract fun hasPermission (Ljava/util/UUID;Ljava/lang/String;)Z
+}
+
+public final class com/justxraf/invitations/ActorContext$PermissionChecker$Companion {
+}
+
+public final class com/justxraf/invitations/AsyncStore : com/justxraf/invitations/InvitationStore {
+	public fun <init> (Lcom/justxraf/invitations/InvitationStore;)V
+	public fun <init> (Lcom/justxraf/invitations/InvitationStore;Lkotlin/jvm/functions/Function1;)V
+	public fun <init> (Lcom/justxraf/invitations/InvitationStore;Lkotlin/jvm/functions/Function1;Ljava/lang/String;)V
+	public synthetic fun <init> (Lcom/justxraf/invitations/InvitationStore;Lkotlin/jvm/functions/Function1;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun close ()V
+	public final fun flush ()V
+	public fun load ()Ljava/util/List;
+	public fun loadExpired (J)Ljava/util/List;
+	public fun remove (Ljava/util/UUID;)V
+	public fun removeAll (Ljava/util/Collection;)V
+	public fun replace (Ljava/util/UUID;Lcom/justxraf/invitations/Invitation;)V
+	public fun save (Lcom/justxraf/invitations/Invitation;)V
+}
+
+public final class com/justxraf/invitations/AuditEntry {
+	public static final field Companion Lcom/justxraf/invitations/AuditEntry$Companion;
+	public fun <init> (Ljava/util/UUID;Ljava/util/UUID;Ljava/util/UUID;Lcom/justxraf/invitations/InvitationAction;JJLjava/lang/Long;Lcom/justxraf/invitations/CancelReason;Ljava/util/UUID;Ljava/util/UUID;ZLjava/util/UUID;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/util/UUID;Ljava/util/UUID;Ljava/util/UUID;Lcom/justxraf/invitations/InvitationAction;JJLjava/lang/Long;Lcom/justxraf/invitations/CancelReason;Ljava/util/UUID;Ljava/util/UUID;ZLjava/util/UUID;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/util/UUID;
+	public final fun component10 ()Ljava/util/UUID;
+	public final fun component11 ()Z
+	public final fun component12 ()Ljava/util/UUID;
+	public final fun component13 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/UUID;
+	public final fun component3 ()Ljava/util/UUID;
+	public final fun component4 ()Lcom/justxraf/invitations/InvitationAction;
+	public final fun component5 ()J
+	public final fun component6 ()J
+	public final fun component7 ()Ljava/lang/Long;
+	public final fun component8 ()Lcom/justxraf/invitations/CancelReason;
+	public final fun component9 ()Ljava/util/UUID;
+	public final fun copy (Ljava/util/UUID;Ljava/util/UUID;Ljava/util/UUID;Lcom/justxraf/invitations/InvitationAction;JJLjava/lang/Long;Lcom/justxraf/invitations/CancelReason;Ljava/util/UUID;Ljava/util/UUID;ZLjava/util/UUID;Ljava/lang/String;)Lcom/justxraf/invitations/AuditEntry;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/AuditEntry;Ljava/util/UUID;Ljava/util/UUID;Ljava/util/UUID;Lcom/justxraf/invitations/InvitationAction;JJLjava/lang/Long;Lcom/justxraf/invitations/CancelReason;Ljava/util/UUID;Ljava/util/UUID;ZLjava/util/UUID;Ljava/lang/String;ILjava/lang/Object;)Lcom/justxraf/invitations/AuditEntry;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAction ()Lcom/justxraf/invitations/InvitationAction;
+	public final fun getActorAdmin ()Z
+	public final fun getActorId ()Ljava/util/UUID;
+	public final fun getActorServerId ()Ljava/lang/String;
+	public final fun getActorWorldId ()Ljava/util/UUID;
+	public final fun getCancelReason ()Lcom/justxraf/invitations/CancelReason;
+	public final fun getCreatedAt ()J
+	public final fun getExpiresAt ()Ljava/lang/Long;
+	public final fun getInvitationId ()Ljava/util/UUID;
+	public final fun getInvitedId ()Ljava/util/UUID;
+	public final fun getInviterId ()Ljava/util/UUID;
+	public final fun getReplacedId ()Ljava/util/UUID;
+	public final fun getTimestamp ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/AuditEntry$Companion {
+	public final fun from (Lcom/justxraf/invitations/LifecycleEvent;)Lcom/justxraf/invitations/AuditEntry;
+}
+
+public final class com/justxraf/invitations/AuditObserver : com/justxraf/invitations/InvitationObserver {
+	public fun <init> (Lcom/justxraf/invitations/InvitationAudit;)V
+	public fun onEvent (Lcom/justxraf/invitations/LifecycleEvent;)V
+}
+
+public final class com/justxraf/invitations/BasicInvitation : com/justxraf/invitations/Invitation {
+	public fun <init> (Ljava/util/UUID;Ljava/util/UUID;Ljava/util/UUID;JLjava/lang/Long;)V
+	public synthetic fun <init> (Ljava/util/UUID;Ljava/util/UUID;Ljava/util/UUID;JLjava/lang/Long;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/util/UUID;
+	public final fun component2 ()Ljava/util/UUID;
+	public final fun component3 ()Ljava/util/UUID;
+	public final fun component4 ()J
+	public final fun component5 ()Ljava/lang/Long;
+	public final fun copy (Ljava/util/UUID;Ljava/util/UUID;Ljava/util/UUID;JLjava/lang/Long;)Lcom/justxraf/invitations/BasicInvitation;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/BasicInvitation;Ljava/util/UUID;Ljava/util/UUID;Ljava/util/UUID;JLjava/lang/Long;ILjava/lang/Object;)Lcom/justxraf/invitations/BasicInvitation;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getCreatedAt ()J
+	public fun getExpiresAt ()Ljava/lang/Long;
+	public fun getId ()Ljava/util/UUID;
+	public fun getInvitedId ()Ljava/util/UUID;
+	public fun getInviterId ()Ljava/util/UUID;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/CancelReason : java/lang/Enum {
+	public static final field ADMIN_CLEARED Lcom/justxraf/invitations/CancelReason;
+	public static final field DUPLICATE_REPLACED Lcom/justxraf/invitations/CancelReason;
+	public static final field PARTY_CLEARED Lcom/justxraf/invitations/CancelReason;
+	public static final field PLAYER_QUIT Lcom/justxraf/invitations/CancelReason;
+	public static final field REVOKED Lcom/justxraf/invitations/CancelReason;
+	public static final field SERVER_SHUTDOWN Lcom/justxraf/invitations/CancelReason;
+	public static final field TARGET_LIMIT_REACHED Lcom/justxraf/invitations/CancelReason;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/justxraf/invitations/CancelReason;
+	public static fun values ()[Lcom/justxraf/invitations/CancelReason;
+}
+
+public abstract interface class com/justxraf/invitations/CancelResult : com/justxraf/invitations/TerminalResult {
+}
+
+public final class com/justxraf/invitations/CancelResult$Cancelled : com/justxraf/invitations/CancelResult {
+	public fun <init> (Ljava/util/UUID;)V
+	public final fun component1 ()Ljava/util/UUID;
+	public final fun copy (Ljava/util/UUID;)Lcom/justxraf/invitations/CancelResult$Cancelled;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/CancelResult$Cancelled;Ljava/util/UUID;ILjava/lang/Object;)Lcom/justxraf/invitations/CancelResult$Cancelled;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getInvitationId ()Ljava/util/UUID;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/CancelResult$DefaultImpls {
+	public static fun getInvitationId (Lcom/justxraf/invitations/CancelResult;)Ljava/util/UUID;
+}
+
+public final class com/justxraf/invitations/CancelResult$NotFound : com/justxraf/invitations/CancelResult {
+	public static final field INSTANCE Lcom/justxraf/invitations/CancelResult$NotFound;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getInvitationId ()Ljava/util/UUID;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/CancelResult$Vetoed : com/justxraf/invitations/CancelResult {
+	public static final field INSTANCE Lcom/justxraf/invitations/CancelResult$Vetoed;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getInvitationId ()Ljava/util/UUID;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/justxraf/invitations/Clock {
+	public static final field Companion Lcom/justxraf/invitations/Clock$Companion;
+	public static final field SYSTEM Lcom/justxraf/invitations/Clock;
+	public static fun fixed (J)Lcom/justxraf/invitations/Clock;
+	public static fun fromScheduler (Lcom/justxraf/invitations/Scheduler;)Lcom/justxraf/invitations/Clock;
+	public abstract fun now ()J
+	public abstract fun plus (Ljava/time/Duration;)J
+}
+
+public final class com/justxraf/invitations/Clock$Companion {
+	public final fun fixed (J)Lcom/justxraf/invitations/Clock;
+	public final fun fromScheduler (Lcom/justxraf/invitations/Scheduler;)Lcom/justxraf/invitations/Clock;
+}
+
+public final class com/justxraf/invitations/Clock$DefaultImpls {
+	public static fun plus (Lcom/justxraf/invitations/Clock;Ljava/time/Duration;)J
+}
+
+public abstract interface class com/justxraf/invitations/DenyResult : com/justxraf/invitations/TerminalResult {
+}
+
+public final class com/justxraf/invitations/DenyResult$DefaultImpls {
+	public static fun getInvitationId (Lcom/justxraf/invitations/DenyResult;)Ljava/util/UUID;
+}
+
+public final class com/justxraf/invitations/DenyResult$Denied : com/justxraf/invitations/DenyResult {
+	public fun <init> (Ljava/util/UUID;)V
+	public final fun component1 ()Ljava/util/UUID;
+	public final fun copy (Ljava/util/UUID;)Lcom/justxraf/invitations/DenyResult$Denied;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/DenyResult$Denied;Ljava/util/UUID;ILjava/lang/Object;)Lcom/justxraf/invitations/DenyResult$Denied;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getInvitationId ()Ljava/util/UUID;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/DenyResult$NotFound : com/justxraf/invitations/DenyResult {
+	public static final field INSTANCE Lcom/justxraf/invitations/DenyResult$NotFound;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getInvitationId ()Ljava/util/UUID;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/DenyResult$Vetoed : com/justxraf/invitations/DenyResult {
+	public static final field INSTANCE Lcom/justxraf/invitations/DenyResult$Vetoed;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getInvitationId ()Ljava/util/UUID;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/DuplicatePolicy : java/lang/Enum {
+	public static final field REFRESH_EXPIRY Lcom/justxraf/invitations/DuplicatePolicy;
+	public static final field REJECT_EXISTING Lcom/justxraf/invitations/DuplicatePolicy;
+	public static final field REPLACE_EXISTING Lcom/justxraf/invitations/DuplicatePolicy;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/justxraf/invitations/DuplicatePolicy;
+	public static fun values ()[Lcom/justxraf/invitations/DuplicatePolicy;
+}
+
+public abstract interface class com/justxraf/invitations/Invitation {
+	public abstract fun getCreatedAt ()J
+	public abstract fun getExpiresAt ()Ljava/lang/Long;
+	public abstract fun getId ()Ljava/util/UUID;
+	public abstract fun getInvitedId ()Ljava/util/UUID;
+	public abstract fun getInviterId ()Ljava/util/UUID;
+}
+
+public final class com/justxraf/invitations/InvitationAction : java/lang/Enum {
+	public static final field ACCEPTED Lcom/justxraf/invitations/InvitationAction;
+	public static final field CANCELLED Lcom/justxraf/invitations/InvitationAction;
+	public static final field DENIED Lcom/justxraf/invitations/InvitationAction;
+	public static final field EXPIRED Lcom/justxraf/invitations/InvitationAction;
+	public static final field REPLACED Lcom/justxraf/invitations/InvitationAction;
+	public static final field SENT Lcom/justxraf/invitations/InvitationAction;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/justxraf/invitations/InvitationAction;
+	public static fun values ()[Lcom/justxraf/invitations/InvitationAction;
+}
+
+public abstract interface class com/justxraf/invitations/InvitationAudit {
+	public static final field Companion Lcom/justxraf/invitations/InvitationAudit$Companion;
+	public static final field Noop Lcom/justxraf/invitations/InvitationAudit;
+	public abstract fun record (Lcom/justxraf/invitations/AuditEntry;)V
+}
+
+public final class com/justxraf/invitations/InvitationAudit$Companion {
+}
+
+public abstract interface class com/justxraf/invitations/InvitationHandler {
+	public abstract fun onAccept (Lcom/justxraf/invitations/Invitation;)V
+	public abstract fun onCancel (Lcom/justxraf/invitations/Invitation;Lcom/justxraf/invitations/CancelReason;)V
+	public abstract fun onDeny (Lcom/justxraf/invitations/Invitation;)V
+	public abstract fun onExpire (Lcom/justxraf/invitations/Invitation;)V
+	public abstract fun onExpiryWarning (Lcom/justxraf/invitations/Invitation;J)V
+	public abstract fun onSend (Lcom/justxraf/invitations/Invitation;)V
+	public abstract fun validate (Lcom/justxraf/invitations/Invitation;Ljava/util/List;)Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/InvitationHandler$DefaultImpls {
+	public static fun onAccept (Lcom/justxraf/invitations/InvitationHandler;Lcom/justxraf/invitations/Invitation;)V
+	public static fun onCancel (Lcom/justxraf/invitations/InvitationHandler;Lcom/justxraf/invitations/Invitation;Lcom/justxraf/invitations/CancelReason;)V
+	public static fun onDeny (Lcom/justxraf/invitations/InvitationHandler;Lcom/justxraf/invitations/Invitation;)V
+	public static fun onExpire (Lcom/justxraf/invitations/InvitationHandler;Lcom/justxraf/invitations/Invitation;)V
+	public static fun onExpiryWarning (Lcom/justxraf/invitations/InvitationHandler;Lcom/justxraf/invitations/Invitation;J)V
+	public static fun onSend (Lcom/justxraf/invitations/InvitationHandler;Lcom/justxraf/invitations/Invitation;)V
+	public static fun validate (Lcom/justxraf/invitations/InvitationHandler;Lcom/justxraf/invitations/Invitation;Ljava/util/List;)Ljava/lang/String;
+}
+
+public abstract interface class com/justxraf/invitations/InvitationLogger {
+	public static final field Companion Lcom/justxraf/invitations/InvitationLogger$Companion;
+	public static final field Noop Lcom/justxraf/invitations/InvitationLogger;
+	public abstract fun debug (Ljava/lang/String;)V
+	public abstract fun error (Ljava/lang/String;Ljava/lang/Throwable;)V
+	public static fun fromJul (Ljava/util/logging/Logger;)Lcom/justxraf/invitations/InvitationLogger;
+	public abstract fun info (Ljava/lang/String;)V
+	public abstract fun log (Lcom/justxraf/invitations/InvitationLogger$Level;Ljava/lang/String;Ljava/lang/Throwable;)V
+	public abstract fun warn (Ljava/lang/String;)V
+}
+
+public final class com/justxraf/invitations/InvitationLogger$Companion {
+	public final fun fromJul (Ljava/util/logging/Logger;)Lcom/justxraf/invitations/InvitationLogger;
+}
+
+public final class com/justxraf/invitations/InvitationLogger$DefaultImpls {
+	public static fun debug (Lcom/justxraf/invitations/InvitationLogger;Ljava/lang/String;)V
+	public static fun error (Lcom/justxraf/invitations/InvitationLogger;Ljava/lang/String;Ljava/lang/Throwable;)V
+	public static synthetic fun error$default (Lcom/justxraf/invitations/InvitationLogger;Ljava/lang/String;Ljava/lang/Throwable;ILjava/lang/Object;)V
+	public static fun info (Lcom/justxraf/invitations/InvitationLogger;Ljava/lang/String;)V
+	public static fun warn (Lcom/justxraf/invitations/InvitationLogger;Ljava/lang/String;)V
+}
+
+public final class com/justxraf/invitations/InvitationLogger$Level : java/lang/Enum {
+	public static final field DEBUG Lcom/justxraf/invitations/InvitationLogger$Level;
+	public static final field ERROR Lcom/justxraf/invitations/InvitationLogger$Level;
+	public static final field INFO Lcom/justxraf/invitations/InvitationLogger$Level;
+	public static final field WARN Lcom/justxraf/invitations/InvitationLogger$Level;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/justxraf/invitations/InvitationLogger$Level;
+	public static fun values ()[Lcom/justxraf/invitations/InvitationLogger$Level;
+}
+
+public final class com/justxraf/invitations/InvitationManager {
+	public static final field Companion Lcom/justxraf/invitations/InvitationManager$Companion;
+	public fun <init> (Lcom/justxraf/invitations/InvitationHandler;Lcom/justxraf/invitations/Scheduler;Ljava/lang/Integer;Lcom/justxraf/invitations/InvitationStore;Ljava/lang/Integer;Ljava/lang/Long;Lcom/justxraf/invitations/DuplicatePolicy;Lcom/justxraf/invitations/SelfInvitePolicy;Ljava/util/List;Lcom/justxraf/invitations/RateLimiter;Ljava/util/List;Ljava/util/List;Ljava/util/List;Lcom/justxraf/invitations/InvitationLogger;Lcom/justxraf/invitations/InvitationMetrics;Lcom/justxraf/invitations/InvitationAudit;Lcom/justxraf/invitations/LifecycleErrorPolicy;Lcom/justxraf/invitations/LifecycleErrorCallback;Lcom/justxraf/invitations/StoreFailurePolicy;ILcom/justxraf/invitations/RehydratePolicy;ZLjava/lang/Long;Lcom/justxraf/invitations/Clock;)V
+	public synthetic fun <init> (Lcom/justxraf/invitations/InvitationHandler;Lcom/justxraf/invitations/Scheduler;Ljava/lang/Integer;Lcom/justxraf/invitations/InvitationStore;Ljava/lang/Integer;Ljava/lang/Long;Lcom/justxraf/invitations/DuplicatePolicy;Lcom/justxraf/invitations/SelfInvitePolicy;Ljava/util/List;Lcom/justxraf/invitations/RateLimiter;Ljava/util/List;Ljava/util/List;Ljava/util/List;Lcom/justxraf/invitations/InvitationLogger;Lcom/justxraf/invitations/InvitationMetrics;Lcom/justxraf/invitations/InvitationAudit;Lcom/justxraf/invitations/LifecycleErrorPolicy;Lcom/justxraf/invitations/LifecycleErrorCallback;Lcom/justxraf/invitations/StoreFailurePolicy;ILcom/justxraf/invitations/RehydratePolicy;ZLjava/lang/Long;Lcom/justxraf/invitations/Clock;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun accept (Ljava/util/UUID;)Z
+	public final fun accept (Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;)Z
+	public final fun accept (Ljava/util/UUID;Ljava/util/UUID;)Z
+	public final fun accept (Ljava/util/UUID;Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;)Z
+	public static synthetic fun accept$default (Lcom/justxraf/invitations/InvitationManager;Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;ILjava/lang/Object;)Z
+	public static synthetic fun accept$default (Lcom/justxraf/invitations/InvitationManager;Ljava/util/UUID;Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;ILjava/lang/Object;)Z
+	public final fun acceptDetailed (Ljava/util/UUID;)Lcom/justxraf/invitations/AcceptResult;
+	public final fun acceptDetailed (Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;)Lcom/justxraf/invitations/AcceptResult;
+	public final fun acceptDetailed (Ljava/util/UUID;Ljava/util/UUID;)Lcom/justxraf/invitations/AcceptResult;
+	public final fun acceptDetailed (Ljava/util/UUID;Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;)Lcom/justxraf/invitations/AcceptResult;
+	public static synthetic fun acceptDetailed$default (Lcom/justxraf/invitations/InvitationManager;Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;ILjava/lang/Object;)Lcom/justxraf/invitations/AcceptResult;
+	public static synthetic fun acceptDetailed$default (Lcom/justxraf/invitations/InvitationManager;Ljava/util/UUID;Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;ILjava/lang/Object;)Lcom/justxraf/invitations/AcceptResult;
+	public final fun adminCancel (Ljava/util/UUID;)Lcom/justxraf/invitations/CancelResult;
+	public final fun adminCancel (Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;)Lcom/justxraf/invitations/CancelResult;
+	public static synthetic fun adminCancel$default (Lcom/justxraf/invitations/InvitationManager;Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;ILjava/lang/Object;)Lcom/justxraf/invitations/CancelResult;
+	public final fun adminClearAllFor (Ljava/util/UUID;)I
+	public final fun adminClearAllFor (Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;)I
+	public static synthetic fun adminClearAllFor$default (Lcom/justxraf/invitations/InvitationManager;Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;ILjava/lang/Object;)I
+	public final fun all ()Ljava/util/List;
+	public final fun all (Lcom/justxraf/invitations/SortOrder;)Ljava/util/List;
+	public static synthetic fun all$default (Lcom/justxraf/invitations/InvitationManager;Lcom/justxraf/invitations/SortOrder;ILjava/lang/Object;)Ljava/util/List;
+	public static final fun builder (Lcom/justxraf/invitations/InvitationHandler;Lcom/justxraf/invitations/Scheduler;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun cancel (Ljava/util/UUID;)Z
+	public final fun cancel (Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;)Z
+	public static synthetic fun cancel$default (Lcom/justxraf/invitations/InvitationManager;Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;ILjava/lang/Object;)Z
+	public final fun cancelAllFrom (Ljava/util/UUID;)I
+	public final fun cancelDetailed (Ljava/util/UUID;)Lcom/justxraf/invitations/CancelResult;
+	public final fun cancelDetailed (Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;)Lcom/justxraf/invitations/CancelResult;
+	public static synthetic fun cancelDetailed$default (Lcom/justxraf/invitations/InvitationManager;Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;ILjava/lang/Object;)Lcom/justxraf/invitations/CancelResult;
+	public final fun clearAllFor (Ljava/util/UUID;)I
+	public final fun clearAllFor (Ljava/util/UUID;Lcom/justxraf/invitations/CancelReason;)I
+	public static synthetic fun clearAllFor$default (Lcom/justxraf/invitations/InvitationManager;Ljava/util/UUID;Lcom/justxraf/invitations/CancelReason;ILjava/lang/Object;)I
+	public final fun clearAsInvited (Ljava/util/UUID;)I
+	public final fun clearAsInvited (Ljava/util/UUID;Lcom/justxraf/invitations/CancelReason;)I
+	public static synthetic fun clearAsInvited$default (Lcom/justxraf/invitations/InvitationManager;Ljava/util/UUID;Lcom/justxraf/invitations/CancelReason;ILjava/lang/Object;)I
+	public final fun clearAsInviter (Ljava/util/UUID;)I
+	public final fun clearAsInviter (Ljava/util/UUID;Lcom/justxraf/invitations/CancelReason;)I
+	public static synthetic fun clearAsInviter$default (Lcom/justxraf/invitations/InvitationManager;Ljava/util/UUID;Lcom/justxraf/invitations/CancelReason;ILjava/lang/Object;)I
+	public final fun clearFor (Ljava/util/UUID;)I
+	public final fun countFor (Ljava/util/UUID;)I
+	public final fun countFrom (Ljava/util/UUID;)I
+	public final fun deny (Ljava/util/UUID;)Z
+	public final fun deny (Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;)Z
+	public static synthetic fun deny$default (Lcom/justxraf/invitations/InvitationManager;Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;ILjava/lang/Object;)Z
+	public final fun denyAll (Ljava/util/UUID;)I
+	public final fun denyDetailed (Ljava/util/UUID;)Lcom/justxraf/invitations/DenyResult;
+	public final fun denyDetailed (Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;)Lcom/justxraf/invitations/DenyResult;
+	public static synthetic fun denyDetailed$default (Lcom/justxraf/invitations/InvitationManager;Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;ILjava/lang/Object;)Lcom/justxraf/invitations/DenyResult;
+	public final fun get (Ljava/util/UUID;)Lcom/justxraf/invitations/Invitation;
+	public final fun getInvite (Ljava/util/UUID;Ljava/util/UUID;)Lcom/justxraf/invitations/Invitation;
+	public final fun getInvitesBetween (Ljava/util/UUID;Ljava/util/UUID;)Ljava/util/List;
+	public final fun getInvitesBetween (Ljava/util/UUID;Ljava/util/UUID;Lcom/justxraf/invitations/SortOrder;)Ljava/util/List;
+	public static synthetic fun getInvitesBetween$default (Lcom/justxraf/invitations/InvitationManager;Ljava/util/UUID;Ljava/util/UUID;Lcom/justxraf/invitations/SortOrder;ILjava/lang/Object;)Ljava/util/List;
+	public final fun getInvitesFor (Ljava/util/UUID;)Ljava/util/List;
+	public final fun getInvitesFor (Ljava/util/UUID;Lcom/justxraf/invitations/SortOrder;)Ljava/util/List;
+	public static synthetic fun getInvitesFor$default (Lcom/justxraf/invitations/InvitationManager;Ljava/util/UUID;Lcom/justxraf/invitations/SortOrder;ILjava/lang/Object;)Ljava/util/List;
+	public final fun getInvitesFrom (Ljava/util/UUID;)Ljava/util/List;
+	public final fun getInvitesFrom (Ljava/util/UUID;Lcom/justxraf/invitations/SortOrder;)Ljava/util/List;
+	public static synthetic fun getInvitesFrom$default (Lcom/justxraf/invitations/InvitationManager;Ljava/util/UUID;Lcom/justxraf/invitations/SortOrder;ILjava/lang/Object;)Ljava/util/List;
+	public final fun getMostRecentFor (Ljava/util/UUID;)Lcom/justxraf/invitations/Invitation;
+	public final fun isHealthy ()Z
+	public final fun pendingCount ()I
+	public final fun rehydrate ()I
+	public final fun send (Lcom/justxraf/invitations/Invitation;)Lcom/justxraf/invitations/InvitationManager$SendResult;
+	public final fun send (Lcom/justxraf/invitations/Invitation;Lcom/justxraf/invitations/ActorContext;)Lcom/justxraf/invitations/InvitationManager$SendResult;
+	public static synthetic fun send$default (Lcom/justxraf/invitations/InvitationManager;Lcom/justxraf/invitations/Invitation;Lcom/justxraf/invitations/ActorContext;ILjava/lang/Object;)Lcom/justxraf/invitations/InvitationManager$SendResult;
+	public final fun shutdown ()V
+	public final fun sweepExpired ()I
+}
+
+public final class com/justxraf/invitations/InvitationManager$Builder {
+	public final fun audit (Lcom/justxraf/invitations/InvitationAudit;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun build ()Lcom/justxraf/invitations/InvitationManager;
+	public final fun clock (Lcom/justxraf/invitations/Clock;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun duplicatePolicy (Lcom/justxraf/invitations/DuplicatePolicy;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun errorCallback (Lcom/justxraf/invitations/LifecycleErrorCallback;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun errorPolicy (Lcom/justxraf/invitations/LifecycleErrorPolicy;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun expiryWarningOffsetsMillis ([J)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun logger (Lcom/justxraf/invitations/InvitationLogger;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun maxExpiry (Ljava/time/Duration;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun maxPerInvited (Ljava/lang/Integer;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun maxPerInviter (Ljava/lang/Integer;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun metrics (Lcom/justxraf/invitations/InvitationMetrics;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun observer (Lcom/justxraf/invitations/InvitationObserver;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun pairCooldownMillis (Ljava/lang/Long;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun rateLimiter (Lcom/justxraf/invitations/RateLimiter;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun rateLimits (Lcom/justxraf/invitations/RateLimiter$Limit;Lcom/justxraf/invitations/RateLimiter$Limit;Lcom/justxraf/invitations/RateLimiter$Limit;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public static synthetic fun rateLimits$default (Lcom/justxraf/invitations/InvitationManager$Builder;Lcom/justxraf/invitations/RateLimiter$Limit;Lcom/justxraf/invitations/RateLimiter$Limit;Lcom/justxraf/invitations/RateLimiter$Limit;ILjava/lang/Object;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun rehydratePolicy (Lcom/justxraf/invitations/RehydratePolicy;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun requireExpiry (Z)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun selfInvitePolicy (Lcom/justxraf/invitations/SelfInvitePolicy;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun store (Lcom/justxraf/invitations/InvitationStore;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun storeFailurePolicy (Lcom/justxraf/invitations/StoreFailurePolicy;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun storeWriteRetries (I)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun validationPolicy (Lcom/justxraf/invitations/ValidationPolicy;)Lcom/justxraf/invitations/InvitationManager$Builder;
+	public final fun veto (Lcom/justxraf/invitations/InvitationVeto;)Lcom/justxraf/invitations/InvitationManager$Builder;
+}
+
+public final class com/justxraf/invitations/InvitationManager$Companion {
+	public final fun builder (Lcom/justxraf/invitations/InvitationHandler;Lcom/justxraf/invitations/Scheduler;)Lcom/justxraf/invitations/InvitationManager$Builder;
+}
+
+public abstract interface class com/justxraf/invitations/InvitationManager$SendResult {
+}
+
+public final class com/justxraf/invitations/InvitationManager$SendResult$Accepted : com/justxraf/invitations/InvitationManager$SendResult {
+	public fun <init> (Ljava/util/UUID;)V
+	public final fun component1 ()Ljava/util/UUID;
+	public final fun copy (Ljava/util/UUID;)Lcom/justxraf/invitations/InvitationManager$SendResult$Accepted;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/InvitationManager$SendResult$Accepted;Ljava/util/UUID;ILjava/lang/Object;)Lcom/justxraf/invitations/InvitationManager$SendResult$Accepted;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getInvitationId ()Ljava/util/UUID;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/InvitationManager$SendResult$CooldownActive : com/justxraf/invitations/InvitationManager$SendResult {
+	public fun <init> (J)V
+	public final fun component1 ()J
+	public final fun copy (J)Lcom/justxraf/invitations/InvitationManager$SendResult$CooldownActive;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/InvitationManager$SendResult$CooldownActive;JILjava/lang/Object;)Lcom/justxraf/invitations/InvitationManager$SendResult$CooldownActive;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getRemainingMillis ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/InvitationManager$SendResult$Duplicate : com/justxraf/invitations/InvitationManager$SendResult {
+	public fun <init> (Ljava/util/UUID;)V
+	public final fun component1 ()Ljava/util/UUID;
+	public final fun copy (Ljava/util/UUID;)Lcom/justxraf/invitations/InvitationManager$SendResult$Duplicate;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/InvitationManager$SendResult$Duplicate;Ljava/util/UUID;ILjava/lang/Object;)Lcom/justxraf/invitations/InvitationManager$SendResult$Duplicate;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getExistingId ()Ljava/util/UUID;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/InvitationManager$SendResult$ExpiryRequired : com/justxraf/invitations/InvitationManager$SendResult {
+	public static final field INSTANCE Lcom/justxraf/invitations/InvitationManager$SendResult$ExpiryRequired;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/InvitationManager$SendResult$ExpiryTooLong : com/justxraf/invitations/InvitationManager$SendResult {
+	public fun <init> (JJ)V
+	public final fun component1 ()J
+	public final fun component2 ()J
+	public final fun copy (JJ)Lcom/justxraf/invitations/InvitationManager$SendResult$ExpiryTooLong;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/InvitationManager$SendResult$ExpiryTooLong;JJILjava/lang/Object;)Lcom/justxraf/invitations/InvitationManager$SendResult$ExpiryTooLong;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMaxMillis ()J
+	public final fun getRequestedMillis ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/InvitationManager$SendResult$LimitReached : com/justxraf/invitations/InvitationManager$SendResult {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lcom/justxraf/invitations/InvitationManager$SendResult$LimitReached;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/InvitationManager$SendResult$LimitReached;IILjava/lang/Object;)Lcom/justxraf/invitations/InvitationManager$SendResult$LimitReached;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLimit ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/InvitationManager$SendResult$PolicyRejected : com/justxraf/invitations/InvitationManager$SendResult {
+	public fun <init> (Lcom/justxraf/invitations/RejectionReason;)V
+	public final fun component1 ()Lcom/justxraf/invitations/RejectionReason;
+	public final fun copy (Lcom/justxraf/invitations/RejectionReason;)Lcom/justxraf/invitations/InvitationManager$SendResult$PolicyRejected;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/InvitationManager$SendResult$PolicyRejected;Lcom/justxraf/invitations/RejectionReason;ILjava/lang/Object;)Lcom/justxraf/invitations/InvitationManager$SendResult$PolicyRejected;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getReason ()Lcom/justxraf/invitations/RejectionReason;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/InvitationManager$SendResult$RateLimited : com/justxraf/invitations/InvitationManager$SendResult {
+	public fun <init> (J)V
+	public final fun component1 ()J
+	public final fun copy (J)Lcom/justxraf/invitations/InvitationManager$SendResult$RateLimited;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/InvitationManager$SendResult$RateLimited;JILjava/lang/Object;)Lcom/justxraf/invitations/InvitationManager$SendResult$RateLimited;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getRetryAfterMillis ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/InvitationManager$SendResult$Refreshed : com/justxraf/invitations/InvitationManager$SendResult {
+	public fun <init> (Ljava/util/UUID;)V
+	public final fun component1 ()Ljava/util/UUID;
+	public final fun copy (Ljava/util/UUID;)Lcom/justxraf/invitations/InvitationManager$SendResult$Refreshed;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/InvitationManager$SendResult$Refreshed;Ljava/util/UUID;ILjava/lang/Object;)Lcom/justxraf/invitations/InvitationManager$SendResult$Refreshed;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getInvitationId ()Ljava/util/UUID;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/InvitationManager$SendResult$Rejected : com/justxraf/invitations/InvitationManager$SendResult {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lcom/justxraf/invitations/InvitationManager$SendResult$Rejected;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/InvitationManager$SendResult$Rejected;Ljava/lang/String;ILjava/lang/Object;)Lcom/justxraf/invitations/InvitationManager$SendResult$Rejected;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getReason ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/InvitationManager$SendResult$Replaced : com/justxraf/invitations/InvitationManager$SendResult {
+	public fun <init> (Ljava/util/UUID;Ljava/util/UUID;)V
+	public final fun component1 ()Ljava/util/UUID;
+	public final fun component2 ()Ljava/util/UUID;
+	public final fun copy (Ljava/util/UUID;Ljava/util/UUID;)Lcom/justxraf/invitations/InvitationManager$SendResult$Replaced;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/InvitationManager$SendResult$Replaced;Ljava/util/UUID;Ljava/util/UUID;ILjava/lang/Object;)Lcom/justxraf/invitations/InvitationManager$SendResult$Replaced;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getInvitationId ()Ljava/util/UUID;
+	public final fun getReplacedId ()Ljava/util/UUID;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/InvitationManager$SendResult$SelfInvite : com/justxraf/invitations/InvitationManager$SendResult {
+	public static final field INSTANCE Lcom/justxraf/invitations/InvitationManager$SendResult$SelfInvite;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/InvitationManager$SendResult$StoreFailure : com/justxraf/invitations/InvitationManager$SendResult {
+	public fun <init> (Ljava/lang/Throwable;)V
+	public final fun component1 ()Ljava/lang/Throwable;
+	public final fun copy (Ljava/lang/Throwable;)Lcom/justxraf/invitations/InvitationManager$SendResult$StoreFailure;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/InvitationManager$SendResult$StoreFailure;Ljava/lang/Throwable;ILjava/lang/Object;)Lcom/justxraf/invitations/InvitationManager$SendResult$StoreFailure;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCause ()Ljava/lang/Throwable;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/InvitationManager$SendResult$Vetoed : com/justxraf/invitations/InvitationManager$SendResult {
+	public static final field INSTANCE Lcom/justxraf/invitations/InvitationManager$SendResult$Vetoed;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/InvitationManager$StoreWriteFailedException : java/lang/RuntimeException {
+	public fun <init> (Ljava/lang/String;Ljava/lang/Throwable;)V
+}
+
+public abstract interface class com/justxraf/invitations/InvitationMetrics {
+	public static final field Companion Lcom/justxraf/invitations/InvitationMetrics$Companion;
+	public static final field Noop Lcom/justxraf/invitations/InvitationMetrics;
+	public abstract fun increment (Lcom/justxraf/invitations/InvitationAction;)V
+	public abstract fun recordSendOutcome (Lcom/justxraf/invitations/InvitationManager$SendResult;)V
+	public abstract fun recordStoreFailure ()V
+}
+
+public final class com/justxraf/invitations/InvitationMetrics$Companion {
+}
+
+public final class com/justxraf/invitations/InvitationMetrics$InMemory : com/justxraf/invitations/InvitationMetrics {
+	public fun <init> ()V
+	public fun increment (Lcom/justxraf/invitations/InvitationAction;)V
+	public fun recordSendOutcome (Lcom/justxraf/invitations/InvitationManager$SendResult;)V
+	public fun recordStoreFailure ()V
+	public final fun snapshot ()Lcom/justxraf/invitations/InvitationMetrics$InMemory$Snapshot;
+}
+
+public final class com/justxraf/invitations/InvitationMetrics$InMemory$Snapshot {
+	public fun <init> (JJJJJJJJJJJJJ)V
+	public final fun component1 ()J
+	public final fun component10 ()J
+	public final fun component11 ()J
+	public final fun component12 ()J
+	public final fun component13 ()J
+	public final fun component2 ()J
+	public final fun component3 ()J
+	public final fun component4 ()J
+	public final fun component5 ()J
+	public final fun component6 ()J
+	public final fun component7 ()J
+	public final fun component8 ()J
+	public final fun component9 ()J
+	public final fun copy (JJJJJJJJJJJJJ)Lcom/justxraf/invitations/InvitationMetrics$InMemory$Snapshot;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/InvitationMetrics$InMemory$Snapshot;JJJJJJJJJJJJJILjava/lang/Object;)Lcom/justxraf/invitations/InvitationMetrics$InMemory$Snapshot;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAccepted ()J
+	public final fun getCancelled ()J
+	public final fun getCooldownActive ()J
+	public final fun getDenied ()J
+	public final fun getDuplicate ()J
+	public final fun getExpired ()J
+	public final fun getLimitReached ()J
+	public final fun getRateLimited ()J
+	public final fun getRejected ()J
+	public final fun getReplaced ()J
+	public final fun getSelfInvite ()J
+	public final fun getSent ()J
+	public final fun getStoreFailures ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/justxraf/invitations/InvitationObserver {
+	public abstract fun onEvent (Lcom/justxraf/invitations/LifecycleEvent;)V
+}
+
+public abstract interface class com/justxraf/invitations/InvitationSerializer {
+	public abstract fun deserialize (Ljava/util/Map;)Lcom/justxraf/invitations/Invitation;
+	public abstract fun serialize (Lcom/justxraf/invitations/Invitation;)Ljava/util/Map;
+}
+
+public abstract interface class com/justxraf/invitations/InvitationStore : java/lang/AutoCloseable {
+	public abstract fun close ()V
+	public abstract fun load ()Ljava/util/List;
+	public abstract fun loadExpired (J)Ljava/util/List;
+	public abstract fun remove (Ljava/util/UUID;)V
+	public abstract fun removeAll (Ljava/util/Collection;)V
+	public abstract fun replace (Ljava/util/UUID;Lcom/justxraf/invitations/Invitation;)V
+	public abstract fun save (Lcom/justxraf/invitations/Invitation;)V
+}
+
+public final class com/justxraf/invitations/InvitationStore$DefaultImpls {
+	public static fun close (Lcom/justxraf/invitations/InvitationStore;)V
+	public static fun loadExpired (Lcom/justxraf/invitations/InvitationStore;J)Ljava/util/List;
+	public static fun removeAll (Lcom/justxraf/invitations/InvitationStore;Ljava/util/Collection;)V
+	public static fun replace (Lcom/justxraf/invitations/InvitationStore;Ljava/util/UUID;Lcom/justxraf/invitations/Invitation;)V
+}
+
+public final class com/justxraf/invitations/InvitationStore$InMemory : com/justxraf/invitations/InvitationStore {
+	public fun <init> ()V
+	public fun close ()V
+	public fun load ()Ljava/util/List;
+	public fun loadExpired (J)Ljava/util/List;
+	public fun remove (Ljava/util/UUID;)V
+	public fun removeAll (Ljava/util/Collection;)V
+	public fun replace (Ljava/util/UUID;Lcom/justxraf/invitations/Invitation;)V
+	public fun save (Lcom/justxraf/invitations/Invitation;)V
+}
+
+public abstract interface class com/justxraf/invitations/InvitationVeto {
+	public static final field AllowAll Lcom/justxraf/invitations/InvitationVeto;
+	public static final field Companion Lcom/justxraf/invitations/InvitationVeto$Companion;
+	public abstract fun isVetoed (Lcom/justxraf/invitations/Invitation;Lcom/justxraf/invitations/InvitationAction;Lcom/justxraf/invitations/CancelReason;)Z
+}
+
+public final class com/justxraf/invitations/InvitationVeto$Companion {
+	public final fun allowAll ()Lcom/justxraf/invitations/InvitationVeto;
+}
+
+public final class com/justxraf/invitations/Invitations {
+	public static final field INSTANCE Lcom/justxraf/invitations/Invitations;
+	public static final fun between (Ljava/util/UUID;Ljava/util/UUID;)Lcom/justxraf/invitations/BasicInvitation;
+	public static final fun between (Ljava/util/UUID;Ljava/util/UUID;Ljava/time/Duration;)Lcom/justxraf/invitations/BasicInvitation;
+	public static final fun between (Ljava/util/UUID;Ljava/util/UUID;Ljava/time/Duration;J)Lcom/justxraf/invitations/BasicInvitation;
+	public static synthetic fun between$default (Ljava/util/UUID;Ljava/util/UUID;Ljava/time/Duration;JILjava/lang/Object;)Lcom/justxraf/invitations/BasicInvitation;
+	public static final fun expiresAfter (Ljava/time/Duration;)Ljava/lang/Long;
+	public static final fun expiresAfter (Ljava/time/Duration;J)Ljava/lang/Long;
+	public static synthetic fun expiresAfter$default (Ljava/time/Duration;JILjava/lang/Object;)Ljava/lang/Long;
+	public static final fun expiresAt (Ljava/time/Duration;)Ljava/lang/Long;
+	public static final fun expiresAt (Ljava/time/Duration;J)Ljava/lang/Long;
+	public static synthetic fun expiresAt$default (Ljava/time/Duration;JILjava/lang/Object;)Ljava/lang/Long;
+	public static final fun newId ()Ljava/util/UUID;
+}
+
+public abstract class com/justxraf/invitations/JavaInvitationHandler : com/justxraf/invitations/InvitationHandler {
+	public fun <init> ()V
+	public fun onAccept (Lcom/justxraf/invitations/Invitation;)V
+	public fun onCancel (Lcom/justxraf/invitations/Invitation;Lcom/justxraf/invitations/CancelReason;)V
+	public fun onDeny (Lcom/justxraf/invitations/Invitation;)V
+	public fun onExpire (Lcom/justxraf/invitations/Invitation;)V
+	public fun onExpiryWarning (Lcom/justxraf/invitations/Invitation;J)V
+	public fun onSend (Lcom/justxraf/invitations/Invitation;)V
+	public fun validate (Lcom/justxraf/invitations/Invitation;Ljava/util/List;)Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/JsonFileStore : com/justxraf/invitations/InvitationStore {
+	public fun <init> (Ljava/io/File;Lcom/justxraf/invitations/InvitationSerializer;)V
+	public fun <init> (Ljava/io/File;Lcom/justxraf/invitations/InvitationSerializer;Z)V
+	public fun <init> (Ljava/io/File;Lcom/justxraf/invitations/InvitationSerializer;ZZ)V
+	public synthetic fun <init> (Ljava/io/File;Lcom/justxraf/invitations/InvitationSerializer;ZZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun close ()V
+	public fun load ()Ljava/util/List;
+	public fun loadExpired (J)Ljava/util/List;
+	public fun remove (Ljava/util/UUID;)V
+	public fun removeAll (Ljava/util/Collection;)V
+	public fun replace (Ljava/util/UUID;Lcom/justxraf/invitations/Invitation;)V
+	public fun save (Lcom/justxraf/invitations/Invitation;)V
+}
+
+public abstract interface class com/justxraf/invitations/LifecycleErrorCallback {
+	public static final field Companion Lcom/justxraf/invitations/LifecycleErrorCallback$Companion;
+	public static final field Noop Lcom/justxraf/invitations/LifecycleErrorCallback;
+	public abstract fun onLifecycleError (Lcom/justxraf/invitations/Invitation;Lcom/justxraf/invitations/InvitationAction;Ljava/lang/Throwable;)V
+}
+
+public final class com/justxraf/invitations/LifecycleErrorCallback$Companion {
+	public final fun noop ()Lcom/justxraf/invitations/LifecycleErrorCallback;
+}
+
+public final class com/justxraf/invitations/LifecycleErrorPolicy : java/lang/Enum {
+	public static final field ISOLATE Lcom/justxraf/invitations/LifecycleErrorPolicy;
+	public static final field PROPAGATE Lcom/justxraf/invitations/LifecycleErrorPolicy;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/justxraf/invitations/LifecycleErrorPolicy;
+	public static fun values ()[Lcom/justxraf/invitations/LifecycleErrorPolicy;
+}
+
+public final class com/justxraf/invitations/LifecycleEvent {
+	public fun <init> (Lcom/justxraf/invitations/Invitation;Lcom/justxraf/invitations/InvitationAction;JLcom/justxraf/invitations/CancelReason;Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;)V
+	public synthetic fun <init> (Lcom/justxraf/invitations/Invitation;Lcom/justxraf/invitations/InvitationAction;JLcom/justxraf/invitations/CancelReason;Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lcom/justxraf/invitations/Invitation;
+	public final fun component2 ()Lcom/justxraf/invitations/InvitationAction;
+	public final fun component3 ()J
+	public final fun component4 ()Lcom/justxraf/invitations/CancelReason;
+	public final fun component5 ()Ljava/util/UUID;
+	public final fun component6 ()Lcom/justxraf/invitations/ActorContext;
+	public final fun copy (Lcom/justxraf/invitations/Invitation;Lcom/justxraf/invitations/InvitationAction;JLcom/justxraf/invitations/CancelReason;Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;)Lcom/justxraf/invitations/LifecycleEvent;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/LifecycleEvent;Lcom/justxraf/invitations/Invitation;Lcom/justxraf/invitations/InvitationAction;JLcom/justxraf/invitations/CancelReason;Ljava/util/UUID;Lcom/justxraf/invitations/ActorContext;ILjava/lang/Object;)Lcom/justxraf/invitations/LifecycleEvent;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAction ()Lcom/justxraf/invitations/InvitationAction;
+	public final fun getActor ()Lcom/justxraf/invitations/ActorContext;
+	public final fun getCancelReason ()Lcom/justxraf/invitations/CancelReason;
+	public final fun getInvitation ()Lcom/justxraf/invitations/Invitation;
+	public final fun getReplacedId ()Ljava/util/UUID;
+	public final fun getTimestamp ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/LoggingObserver : com/justxraf/invitations/InvitationObserver {
+	public fun <init> (Lcom/justxraf/invitations/InvitationLogger;)V
+	public fun onEvent (Lcom/justxraf/invitations/LifecycleEvent;)V
+}
+
+public final class com/justxraf/invitations/MetricsObserver : com/justxraf/invitations/InvitationObserver {
+	public fun <init> (Lcom/justxraf/invitations/InvitationMetrics;)V
+	public fun onEvent (Lcom/justxraf/invitations/LifecycleEvent;)V
+}
+
+public final class com/justxraf/invitations/RateLimiter {
+	public fun <init> (Lcom/justxraf/invitations/RateLimiter$Limit;Lcom/justxraf/invitations/RateLimiter$Limit;Lcom/justxraf/invitations/RateLimiter$Limit;Lkotlin/jvm/functions/Function0;)V
+	public synthetic fun <init> (Lcom/justxraf/invitations/RateLimiter$Limit;Lcom/justxraf/invitations/RateLimiter$Limit;Lcom/justxraf/invitations/RateLimiter$Limit;Lkotlin/jvm/functions/Function0;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun forget (Ljava/util/UUID;Ljava/util/UUID;)V
+	public final fun isNoop ()Z
+	public final fun tryAcquire (Ljava/util/UUID;Ljava/util/UUID;)Lcom/justxraf/invitations/RateLimiter$Decision;
+}
+
+public abstract interface class com/justxraf/invitations/RateLimiter$Decision {
+}
+
+public final class com/justxraf/invitations/RateLimiter$Decision$Allowed : com/justxraf/invitations/RateLimiter$Decision {
+	public static final field INSTANCE Lcom/justxraf/invitations/RateLimiter$Decision$Allowed;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/RateLimiter$Decision$Limited : com/justxraf/invitations/RateLimiter$Decision {
+	public fun <init> (J)V
+	public final fun component1 ()J
+	public final fun copy (J)Lcom/justxraf/invitations/RateLimiter$Decision$Limited;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/RateLimiter$Decision$Limited;JILjava/lang/Object;)Lcom/justxraf/invitations/RateLimiter$Decision$Limited;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getRetryAfterMillis ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/RateLimiter$Limit {
+	public fun <init> (IJ)V
+	public final fun component1 ()I
+	public final fun component2 ()J
+	public final fun copy (IJ)Lcom/justxraf/invitations/RateLimiter$Limit;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/RateLimiter$Limit;IJILjava/lang/Object;)Lcom/justxraf/invitations/RateLimiter$Limit;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMax ()I
+	public final fun getWindowMillis ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/RehydratePolicy {
+	public static final field Companion Lcom/justxraf/invitations/RehydratePolicy$Companion;
+	public static final field DROP_INVALID Lcom/justxraf/invitations/RehydratePolicy;
+	public static final field REPAIR Lcom/justxraf/invitations/RehydratePolicy;
+	public static final field TRUST_STORE Lcom/justxraf/invitations/RehydratePolicy;
+	public fun <init> (ZZZZ)V
+	public final fun component1 ()Z
+	public final fun component2 ()Z
+	public final fun component3 ()Z
+	public final fun component4 ()Z
+	public final fun copy (ZZZZ)Lcom/justxraf/invitations/RehydratePolicy;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/RehydratePolicy;ZZZZILjava/lang/Object;)Lcom/justxraf/invitations/RehydratePolicy;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDropDuplicateIds ()Z
+	public final fun getDropDuplicatePairs ()Z
+	public final fun getEnforceCaps ()Z
+	public final fun getRepairStore ()Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/RehydratePolicy$Companion {
+}
+
+public final class com/justxraf/invitations/RejectionReason {
+	public static final field Companion Lcom/justxraf/invitations/RejectionReason$Companion;
+	public fun <init> (Lcom/justxraf/invitations/RejectionReason$Code;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;)V
+	public synthetic fun <init> (Lcom/justxraf/invitations/RejectionReason$Code;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lcom/justxraf/invitations/RejectionReason$Code;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/util/Map;
+	public final fun copy (Lcom/justxraf/invitations/RejectionReason$Code;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;)Lcom/justxraf/invitations/RejectionReason;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/RejectionReason;Lcom/justxraf/invitations/RejectionReason$Code;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;ILjava/lang/Object;)Lcom/justxraf/invitations/RejectionReason;
+	public static final fun custom (Ljava/lang/String;Ljava/lang/String;)Lcom/justxraf/invitations/RejectionReason;
+	public static final fun custom (Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;)Lcom/justxraf/invitations/RejectionReason;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getArgs ()Ljava/util/Map;
+	public final fun getCode ()Lcom/justxraf/invitations/RejectionReason$Code;
+	public final fun getFallbackMessage ()Ljava/lang/String;
+	public final fun getMessageKey ()Ljava/lang/String;
+	public fun hashCode ()I
+	public final fun renderFallback ()Ljava/lang/String;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/RejectionReason$Code : java/lang/Enum {
+	public static final field ALREADY_IN_SAME_PARTY Lcom/justxraf/invitations/RejectionReason$Code;
+	public static final field CUSTOM Lcom/justxraf/invitations/RejectionReason$Code;
+	public static final field INVITED_LACKS_PERMISSION Lcom/justxraf/invitations/RejectionReason$Code;
+	public static final field INVITER_LACKS_PERMISSION Lcom/justxraf/invitations/RejectionReason$Code;
+	public static final field PARTY_FULL Lcom/justxraf/invitations/RejectionReason$Code;
+	public static final field RATE_LIMITED Lcom/justxraf/invitations/RejectionReason$Code;
+	public static final field SELF_INVITE Lcom/justxraf/invitations/RejectionReason$Code;
+	public static final field TARGET_IGNORING_INVITER Lcom/justxraf/invitations/RejectionReason$Code;
+	public static final field TARGET_OFFLINE Lcom/justxraf/invitations/RejectionReason$Code;
+	public static final field WORLD_OR_SERVER_RESTRICTED Lcom/justxraf/invitations/RejectionReason$Code;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/justxraf/invitations/RejectionReason$Code;
+	public static fun values ()[Lcom/justxraf/invitations/RejectionReason$Code;
+}
+
+public final class com/justxraf/invitations/RejectionReason$Companion {
+	public final fun custom (Ljava/lang/String;Ljava/lang/String;)Lcom/justxraf/invitations/RejectionReason;
+	public final fun custom (Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;)Lcom/justxraf/invitations/RejectionReason;
+	public static synthetic fun custom$default (Lcom/justxraf/invitations/RejectionReason$Companion;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;ILjava/lang/Object;)Lcom/justxraf/invitations/RejectionReason;
+}
+
+public abstract interface class com/justxraf/invitations/Scheduler {
+	public abstract fun now ()J
+	public abstract fun runLater (JLkotlin/jvm/functions/Function0;)Lcom/justxraf/invitations/Scheduler$Cancellable;
+	public abstract fun runOnMainThread (Lkotlin/jvm/functions/Function0;)V
+}
+
+public abstract interface class com/justxraf/invitations/Scheduler$Cancellable {
+	public abstract fun cancel ()V
+}
+
+public final class com/justxraf/invitations/Scheduler$DefaultImpls {
+	public static fun now (Lcom/justxraf/invitations/Scheduler;)J
+}
+
+public final class com/justxraf/invitations/SelfInvitePolicy : java/lang/Enum {
+	public static final field ALLOW Lcom/justxraf/invitations/SelfInvitePolicy;
+	public static final field REJECT Lcom/justxraf/invitations/SelfInvitePolicy;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/justxraf/invitations/SelfInvitePolicy;
+	public static fun values ()[Lcom/justxraf/invitations/SelfInvitePolicy;
+}
+
+public final class com/justxraf/invitations/SortOrder : java/lang/Enum {
+	public static final field NEWEST_FIRST Lcom/justxraf/invitations/SortOrder;
+	public static final field OLDEST_FIRST Lcom/justxraf/invitations/SortOrder;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/justxraf/invitations/SortOrder;
+	public static fun values ()[Lcom/justxraf/invitations/SortOrder;
+}
+
+public abstract interface class com/justxraf/invitations/SqlDialect {
+	public static final field Companion Lcom/justxraf/invitations/SqlDialect$Companion;
+	public static final field MYSQL Lcom/justxraf/invitations/SqlDialect;
+	public static final field POSTGRES Lcom/justxraf/invitations/SqlDialect;
+	public static final field SQLITE Lcom/justxraf/invitations/SqlDialect;
+	public abstract fun getBigIntType ()Ljava/lang/String;
+	public abstract fun getTextType ()Ljava/lang/String;
+	public abstract fun upsertSql (Ljava/lang/String;)Ljava/lang/String;
+}
+
+public final class com/justxraf/invitations/SqlDialect$Companion {
+}
+
+public final class com/justxraf/invitations/SqlInvitationStore : com/justxraf/invitations/InvitationStore {
+	public fun <init> (Lkotlin/jvm/functions/Function0;Lcom/justxraf/invitations/InvitationSerializer;Lcom/justxraf/invitations/SqlDialect;)V
+	public fun <init> (Lkotlin/jvm/functions/Function0;Lcom/justxraf/invitations/InvitationSerializer;Lcom/justxraf/invitations/SqlDialect;Ljava/lang/String;)V
+	public fun <init> (Lkotlin/jvm/functions/Function0;Lcom/justxraf/invitations/InvitationSerializer;Lcom/justxraf/invitations/SqlDialect;Ljava/lang/String;Z)V
+	public synthetic fun <init> (Lkotlin/jvm/functions/Function0;Lcom/justxraf/invitations/InvitationSerializer;Lcom/justxraf/invitations/SqlDialect;Ljava/lang/String;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun close ()V
+	public fun load ()Ljava/util/List;
+	public fun loadExpired (J)Ljava/util/List;
+	public fun remove (Ljava/util/UUID;)V
+	public fun removeAll (Ljava/util/Collection;)V
+	public fun replace (Ljava/util/UUID;Lcom/justxraf/invitations/Invitation;)V
+	public fun save (Lcom/justxraf/invitations/Invitation;)V
+}
+
+public final class com/justxraf/invitations/SqlMigrations {
+	public static final field INSTANCE Lcom/justxraf/invitations/SqlMigrations;
+	public static final field LATEST I
+	public final fun migrate (Ljava/sql/Connection;Lcom/justxraf/invitations/SqlDialect;Ljava/lang/String;)V
+}
+
+public final class com/justxraf/invitations/SqlMigrations$Step {
+	public fun <init> (ILkotlin/jvm/functions/Function2;)V
+	public final fun getDdl ()Lkotlin/jvm/functions/Function2;
+	public final fun getVersion ()I
+}
+
+public final class com/justxraf/invitations/StoreFailurePolicy : java/lang/Enum {
+	public static final field FAIL_BEFORE_MUTATING Lcom/justxraf/invitations/StoreFailurePolicy;
+	public static final field MARK_UNHEALTHY Lcom/justxraf/invitations/StoreFailurePolicy;
+	public static final field MUTATE_THEN_RETRY Lcom/justxraf/invitations/StoreFailurePolicy;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/justxraf/invitations/StoreFailurePolicy;
+	public static fun values ()[Lcom/justxraf/invitations/StoreFailurePolicy;
+}
+
+public abstract interface class com/justxraf/invitations/TerminalResult {
+	public abstract fun getInvitationId ()Ljava/util/UUID;
+}
+
+public final class com/justxraf/invitations/TerminalResult$DefaultImpls {
+	public static fun getInvitationId (Lcom/justxraf/invitations/TerminalResult;)Ljava/util/UUID;
+}
+
+public abstract interface class com/justxraf/invitations/ValidationPolicy {
+	public static final field Companion Lcom/justxraf/invitations/ValidationPolicy$Companion;
+	public static fun all (Ljava/util/List;)Lcom/justxraf/invitations/ValidationPolicy;
+	public abstract fun andThen (Lcom/justxraf/invitations/ValidationPolicy;)Lcom/justxraf/invitations/ValidationPolicy;
+	public static fun invitedHasPermission (Ljava/lang/String;Lcom/justxraf/invitations/ActorContext$PermissionChecker;)Lcom/justxraf/invitations/ValidationPolicy;
+	public static fun inviterHasPermission (Ljava/lang/String;)Lcom/justxraf/invitations/ValidationPolicy;
+	public static fun inviterHasPermission (Ljava/lang/String;Z)Lcom/justxraf/invitations/ValidationPolicy;
+	public static fun notAlreadyInSameParty (Lcom/justxraf/invitations/ValidationPolicy$PartyMembership;)Lcom/justxraf/invitations/ValidationPolicy;
+	public static fun partyNotFull (Lcom/justxraf/invitations/ValidationPolicy$PartyCapacity;)Lcom/justxraf/invitations/ValidationPolicy;
+	public static fun selfInvite ()Lcom/justxraf/invitations/ValidationPolicy;
+	public static fun targetNotIgnoring (Lcom/justxraf/invitations/ValidationPolicy$IgnoreList;)Lcom/justxraf/invitations/ValidationPolicy;
+	public static fun targetOnline (Lcom/justxraf/invitations/ValidationPolicy$Presence;)Lcom/justxraf/invitations/ValidationPolicy;
+	public static fun targetOnline (ZLcom/justxraf/invitations/ValidationPolicy$Presence;)Lcom/justxraf/invitations/ValidationPolicy;
+	public abstract fun validate (Lcom/justxraf/invitations/Invitation;Ljava/util/List;Lcom/justxraf/invitations/ActorContext;)Lcom/justxraf/invitations/RejectionReason;
+	public static fun worldOrServerRestriction ()Lcom/justxraf/invitations/ValidationPolicy;
+	public static fun worldOrServerRestriction (Ljava/util/Set;)Lcom/justxraf/invitations/ValidationPolicy;
+	public static fun worldOrServerRestriction (Ljava/util/Set;Ljava/util/Set;)Lcom/justxraf/invitations/ValidationPolicy;
+	public static fun worldOrServerRestriction (Ljava/util/Set;Ljava/util/Set;Z)Lcom/justxraf/invitations/ValidationPolicy;
+}
+
+public final class com/justxraf/invitations/ValidationPolicy$Companion {
+	public final fun all (Ljava/util/List;)Lcom/justxraf/invitations/ValidationPolicy;
+	public final fun invitedHasPermission (Ljava/lang/String;Lcom/justxraf/invitations/ActorContext$PermissionChecker;)Lcom/justxraf/invitations/ValidationPolicy;
+	public final fun inviterHasPermission (Ljava/lang/String;)Lcom/justxraf/invitations/ValidationPolicy;
+	public final fun inviterHasPermission (Ljava/lang/String;Z)Lcom/justxraf/invitations/ValidationPolicy;
+	public static synthetic fun inviterHasPermission$default (Lcom/justxraf/invitations/ValidationPolicy$Companion;Ljava/lang/String;ZILjava/lang/Object;)Lcom/justxraf/invitations/ValidationPolicy;
+	public final fun notAlreadyInSameParty (Lcom/justxraf/invitations/ValidationPolicy$PartyMembership;)Lcom/justxraf/invitations/ValidationPolicy;
+	public final fun partyNotFull (Lcom/justxraf/invitations/ValidationPolicy$PartyCapacity;)Lcom/justxraf/invitations/ValidationPolicy;
+	public final fun selfInvite ()Lcom/justxraf/invitations/ValidationPolicy;
+	public final fun targetNotIgnoring (Lcom/justxraf/invitations/ValidationPolicy$IgnoreList;)Lcom/justxraf/invitations/ValidationPolicy;
+	public final fun targetOnline (Lcom/justxraf/invitations/ValidationPolicy$Presence;)Lcom/justxraf/invitations/ValidationPolicy;
+	public final fun targetOnline (ZLcom/justxraf/invitations/ValidationPolicy$Presence;)Lcom/justxraf/invitations/ValidationPolicy;
+	public static synthetic fun targetOnline$default (Lcom/justxraf/invitations/ValidationPolicy$Companion;ZLcom/justxraf/invitations/ValidationPolicy$Presence;ILjava/lang/Object;)Lcom/justxraf/invitations/ValidationPolicy;
+	public final fun worldOrServerRestriction ()Lcom/justxraf/invitations/ValidationPolicy;
+	public final fun worldOrServerRestriction (Ljava/util/Set;)Lcom/justxraf/invitations/ValidationPolicy;
+	public final fun worldOrServerRestriction (Ljava/util/Set;Ljava/util/Set;)Lcom/justxraf/invitations/ValidationPolicy;
+	public final fun worldOrServerRestriction (Ljava/util/Set;Ljava/util/Set;Z)Lcom/justxraf/invitations/ValidationPolicy;
+	public static synthetic fun worldOrServerRestriction$default (Lcom/justxraf/invitations/ValidationPolicy$Companion;Ljava/util/Set;Ljava/util/Set;ZILjava/lang/Object;)Lcom/justxraf/invitations/ValidationPolicy;
+}
+
+public final class com/justxraf/invitations/ValidationPolicy$DefaultImpls {
+	public static fun andThen (Lcom/justxraf/invitations/ValidationPolicy;Lcom/justxraf/invitations/ValidationPolicy;)Lcom/justxraf/invitations/ValidationPolicy;
+}
+
+public abstract interface class com/justxraf/invitations/ValidationPolicy$IgnoreList {
+	public abstract fun ignores (Ljava/util/UUID;Ljava/util/UUID;)Z
+}
+
+public abstract interface class com/justxraf/invitations/ValidationPolicy$PartyCapacity {
+	public abstract fun capacityFor (Ljava/util/UUID;)Lcom/justxraf/invitations/ValidationPolicy$PartyCapacity$Capacity;
+}
+
+public final class com/justxraf/invitations/ValidationPolicy$PartyCapacity$Capacity {
+	public fun <init> (II)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun copy (II)Lcom/justxraf/invitations/ValidationPolicy$PartyCapacity$Capacity;
+	public static synthetic fun copy$default (Lcom/justxraf/invitations/ValidationPolicy$PartyCapacity$Capacity;IIILjava/lang/Object;)Lcom/justxraf/invitations/ValidationPolicy$PartyCapacity$Capacity;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCurrent ()I
+	public final fun getMax ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/justxraf/invitations/ValidationPolicy$PartyMembership {
+	public abstract fun sameParty (Ljava/util/UUID;Ljava/util/UUID;)Z
+}
+
+public abstract interface class com/justxraf/invitations/ValidationPolicy$Presence {
+	public abstract fun isOnline (Ljava/util/UUID;)Z
+}
+
+public final class com/justxraf/invitations/bukkit/BukkitScheduler : com/justxraf/invitations/Scheduler {
+	public fun <init> (Lorg/bukkit/plugin/Plugin;)V
+	public fun now ()J
+	public fun runLater (JLkotlin/jvm/functions/Function0;)Lcom/justxraf/invitations/Scheduler$Cancellable;
+	public fun runOnMainThread (Lkotlin/jvm/functions/Function0;)V
+}
+
+public final class com/justxraf/invitations/bukkit/EventFiringObserver : com/justxraf/invitations/InvitationObserver {
+	public fun <init> ()V
+	public fun onEvent (Lcom/justxraf/invitations/LifecycleEvent;)V
+}
+
+public final class com/justxraf/invitations/bukkit/EventFiringVeto : com/justxraf/invitations/InvitationVeto {
+	public fun <init> ()V
+	public fun isVetoed (Lcom/justxraf/invitations/Invitation;Lcom/justxraf/invitations/InvitationAction;Lcom/justxraf/invitations/CancelReason;)Z
+}
+
+public final class com/justxraf/invitations/bukkit/FoliaScheduler : com/justxraf/invitations/Scheduler {
+	public fun <init> (Lorg/bukkit/plugin/Plugin;)V
+	public fun now ()J
+	public fun runLater (JLkotlin/jvm/functions/Function0;)Lcom/justxraf/invitations/Scheduler$Cancellable;
+	public fun runOnMainThread (Lkotlin/jvm/functions/Function0;)V
+}
+
+public final class com/justxraf/invitations/bukkit/InvitationAcceptEvent : com/justxraf/invitations/bukkit/InvitationEvent, org/bukkit/event/Cancellable {
+	public static final field Companion Lcom/justxraf/invitations/bukkit/InvitationAcceptEvent$Companion;
+	public fun <init> (Lcom/justxraf/invitations/Invitation;)V
+	public static final fun getHandlerList ()Lorg/bukkit/event/HandlerList;
+	public fun isCancelled ()Z
+	public fun setCancelled (Z)V
+}
+
+public final class com/justxraf/invitations/bukkit/InvitationAcceptEvent$Companion {
+	public final fun getHandlerList ()Lorg/bukkit/event/HandlerList;
+}
+
+public final class com/justxraf/invitations/bukkit/InvitationCancelEvent : com/justxraf/invitations/bukkit/InvitationEvent, org/bukkit/event/Cancellable {
+	public static final field Companion Lcom/justxraf/invitations/bukkit/InvitationCancelEvent$Companion;
+	public fun <init> (Lcom/justxraf/invitations/Invitation;Lcom/justxraf/invitations/CancelReason;)V
+	public static final fun getHandlerList ()Lorg/bukkit/event/HandlerList;
+	public final fun getReason ()Lcom/justxraf/invitations/CancelReason;
+	public fun isCancelled ()Z
+	public fun setCancelled (Z)V
+}
+
+public final class com/justxraf/invitations/bukkit/InvitationCancelEvent$Companion {
+	public final fun getHandlerList ()Lorg/bukkit/event/HandlerList;
+}
+
+public final class com/justxraf/invitations/bukkit/InvitationDenyEvent : com/justxraf/invitations/bukkit/InvitationEvent, org/bukkit/event/Cancellable {
+	public static final field Companion Lcom/justxraf/invitations/bukkit/InvitationDenyEvent$Companion;
+	public fun <init> (Lcom/justxraf/invitations/Invitation;)V
+	public static final fun getHandlerList ()Lorg/bukkit/event/HandlerList;
+	public fun isCancelled ()Z
+	public fun setCancelled (Z)V
+}
+
+public final class com/justxraf/invitations/bukkit/InvitationDenyEvent$Companion {
+	public final fun getHandlerList ()Lorg/bukkit/event/HandlerList;
+}
+
+public abstract class com/justxraf/invitations/bukkit/InvitationEvent : org/bukkit/event/Event {
+	public static final field Companion Lcom/justxraf/invitations/bukkit/InvitationEvent$Companion;
+	public synthetic fun <init> (Lcom/justxraf/invitations/Invitation;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun getHandlers ()Lorg/bukkit/event/HandlerList;
+	public final fun getInvitation ()Lcom/justxraf/invitations/Invitation;
+}
+
+public final class com/justxraf/invitations/bukkit/InvitationEvent$Companion {
+}
+
+public final class com/justxraf/invitations/bukkit/InvitationExpireEvent : com/justxraf/invitations/bukkit/InvitationEvent {
+	public static final field Companion Lcom/justxraf/invitations/bukkit/InvitationExpireEvent$Companion;
+	public fun <init> (Lcom/justxraf/invitations/Invitation;)V
+	public static final fun getHandlerList ()Lorg/bukkit/event/HandlerList;
+}
+
+public final class com/justxraf/invitations/bukkit/InvitationExpireEvent$Companion {
+	public final fun getHandlerList ()Lorg/bukkit/event/HandlerList;
+}
+
+public final class com/justxraf/invitations/bukkit/InvitationReplaceEvent : com/justxraf/invitations/bukkit/InvitationEvent {
+	public static final field Companion Lcom/justxraf/invitations/bukkit/InvitationReplaceEvent$Companion;
+	public fun <init> (Lcom/justxraf/invitations/Invitation;Ljava/util/UUID;)V
+	public static final fun getHandlerList ()Lorg/bukkit/event/HandlerList;
+	public final fun getReplacedId ()Ljava/util/UUID;
+}
+
+public final class com/justxraf/invitations/bukkit/InvitationReplaceEvent$Companion {
+	public final fun getHandlerList ()Lorg/bukkit/event/HandlerList;
+}
+
+public final class com/justxraf/invitations/bukkit/InvitationSendEvent : com/justxraf/invitations/bukkit/InvitationEvent, org/bukkit/event/Cancellable {
+	public static final field Companion Lcom/justxraf/invitations/bukkit/InvitationSendEvent$Companion;
+	public fun <init> (Lcom/justxraf/invitations/Invitation;)V
+	public static final fun getHandlerList ()Lorg/bukkit/event/HandlerList;
+	public fun isCancelled ()Z
+	public fun setCancelled (Z)V
+}
+
+public final class com/justxraf/invitations/bukkit/InvitationSendEvent$Companion {
+	public final fun getHandlerList ()Lorg/bukkit/event/HandlerList;
+}
+

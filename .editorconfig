@@ -1,0 +1,30 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+[*.{kt,kts}]
+max_line_length = 140
+# This codebase favors a few intentional patterns over the strictest ktlint defaults.
+ktlint_standard_no-wildcard-imports = disabled
+ktlint_standard_filename = disabled
+# Test method names use backtick `with spaces`.
+ktlint_standard_function-naming = disabled
+# Layout-opinion rules that would reflow nearly every signature/declaration in the codebase and fight
+# its deliberately compact style. Disabled so ktlint enforces substance (indent, imports, semicolons,
+# spacing) without imposing a wholesale reformat. Revisit if the team adopts the standard layout.
+ktlint_standard_function-signature = disabled
+ktlint_standard_class-signature = disabled
+ktlint_standard_statement-wrapping = disabled
+ktlint_standard_multiline-expression-wrapping = disabled
+ktlint_standard_blank-line-before-declaration = disabled
+ktlint_standard_spacing-between-declarations-with-comments = disabled
+ktlint_standard_if-else-wrapping = disabled
+ktlint_standard_multiline-if-else = disabled
+ktlint_standard_no-empty-first-line-in-class-body = disabled
+ktlint_standard_annotation = disabled

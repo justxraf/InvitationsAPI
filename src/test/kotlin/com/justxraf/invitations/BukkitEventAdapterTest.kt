@@ -12,8 +12,6 @@ import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
-import org.mockbukkit.mockbukkit.MockBukkit
-import org.mockbukkit.mockbukkit.ServerMock
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -21,6 +19,8 @@ import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockbukkit.mockbukkit.MockBukkit
+import org.mockbukkit.mockbukkit.ServerMock
 import java.util.UUID
 class BukkitEventAdapterTest {
 
@@ -36,10 +36,15 @@ class BukkitEventAdapterTest {
         server.pluginManager.registerEvents(
             object : Listener {
                 @EventHandler fun on(e: InvitationSendEvent) { captured.add(e) }
+
                 @EventHandler fun on(e: InvitationAcceptEvent) { captured.add(e) }
+
                 @EventHandler fun on(e: InvitationDenyEvent) { captured.add(e) }
+
                 @EventHandler fun on(e: InvitationCancelEvent) { captured.add(e) }
+
                 @EventHandler fun on(e: InvitationExpireEvent) { captured.add(e) }
+
                 @EventHandler fun on(e: InvitationReplaceEvent) { captured.add(e) }
             },
             plugin,

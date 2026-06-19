@@ -73,24 +73,24 @@ class JsonFileStore<T : Invitation> @JvmOverloads constructor(
             if (byId.remove(id) != null) flush()
         }
     }
-override fun removeAll(ids: Collection<UUID>) {
+    override fun removeAll(ids: Collection<UUID>) {
         synchronized(lock) {
             var changed = false
             for (id in ids) if (byId.remove(id) != null) changed = true
             if (changed) flush()
         }
     }
-override fun replace(old: UUID, new: T) {
+    override fun replace(old: UUID, new: T) {
         synchronized(lock) {
             byId.remove(old)
             byId[new.id] = new
             flush()
         }
     }
-override fun close() {
+    override fun close() {
         lockHandle?.release()
     }
-private fun flush() {
+    private fun flush() {
         // Swap a temp file into place so a crash is less likely to leave a half-written store.
         val text = Json.writeArray(byId.values.map { serializer.serialize(it) })
         file.parentFile?.mkdirs()
@@ -104,7 +104,7 @@ private fun flush() {
             Files.move(tmpPath, target, StandardCopyOption.REPLACE_EXISTING)
         }
     }
-private fun quarantineCorruptFile() {
+    private fun quarantineCorruptFile() {
         val backup = File(file.parentFile, "${file.name}.corrupt-${System.currentTimeMillis()}")
         try {
             Files.move(file.toPath(), backup.toPath(), StandardCopyOption.REPLACE_EXISTING)
@@ -137,13 +137,19 @@ private fun quarantineCorruptFile() {
         private val lockFile: File,
     ) {
         fun release() {
-            try { fileLock.release() } catch (_: IOException) {}
-            try { raf.close() } catch (_: IOException) {}
+            try {
+                fileLock.release()
+            } catch (_: IOException) {
+            }
+            try {
+                raf.close()
+            } catch (_: IOException) {
+            }
             lockFile.delete()
         }
     }
 // This store only persists flat string maps, so a tiny JSON parser keeps the dependency surface small.
-private object Json {
+    private object Json {
 
         fun writeArray(objects: List<Map<String, String>>): String =
             objects.joinToString(prefix = "[", postfix = "]", separator = ",") { obj ->
@@ -156,13 +162,15 @@ private object Json {
 
         private fun quote(s: String): String = buildString {
             append('"')
-            for (c in s) when (c) {
-                '"' -> append("\\\"")
-                '\\' -> append("\\\\")
-                '\n' -> append("\\n")
-                '\r' -> append("\\r")
-                '\t' -> append("\\t")
-                else -> append(c)
+            for (c in s) {
+                when (c) {
+                    '"' -> append("\\\"")
+                    '\\' -> append("\\\\")
+                    '\n' -> append("\\n")
+                    '\r' -> append("\\r")
+                    '\t' -> append("\\t")
+                    else -> append(c)
+                }
             }
             append('"')
         }

@@ -17,9 +17,11 @@ private class FakeScheduler : Scheduler {
     override fun runOnMainThread(block: () -> Unit) = block()
     override fun runLater(delayMillis: Long, block: () -> Unit): Scheduler.Cancellable =
         Task(clock + delayMillis, block).also { tasks += it }
-fun advance(millis: Long) {
+    fun advance(millis: Long) {
         clock += millis
-        tasks.filter { !it.cancelled && it.fireAtMillis <= clock }.also { tasks.removeAll(it.toSet()) }
+        tasks
+            .filter { !it.cancelled && it.fireAtMillis <= clock }
+            .also { tasks.removeAll(it.toSet()) }
             .forEach { it.block() }
     }
 }
@@ -351,7 +353,8 @@ class InvitationManagerTest {
 
     @Test fun `builder configures store and invite caps`() {
         val store = InvitationStore.InMemory<TestInvite>()
-        val m = InvitationManager.builder(RecordingHandler(), FakeScheduler())
+        val m = InvitationManager
+            .builder(RecordingHandler(), FakeScheduler())
             .maxPerInviter(1)
             .maxPerInvited(1)
             .pairCooldownMillis(2500)
@@ -711,8 +714,10 @@ class InvitationManagerTest {
     }
 
     @Test fun `maxExpiry rejects invites that outlive the guardrail`() {
-        val m = InvitationManager.builder(RecordingHandler(), FakeScheduler())
-            .maxExpiry(java.time.Duration.ofMillis(1000)).build()
+        val m = InvitationManager
+            .builder(RecordingHandler(), FakeScheduler())
+            .maxExpiry(java.time.Duration.ofMillis(1000))
+            .build()
         // FakeScheduler starts at now = 0, so this asks for a 5000ms life against a 1000ms cap.
         val inv = TestInvite(inviterId = a, invitedId = b, expiresAt = 5000)
 
@@ -724,8 +729,10 @@ class InvitationManagerTest {
     }
 
     @Test fun `maxExpiry accepts invites within the guardrail`() {
-        val m = InvitationManager.builder(RecordingHandler(), FakeScheduler())
-            .maxExpiry(java.time.Duration.ofMillis(5000)).build()
+        val m = InvitationManager
+            .builder(RecordingHandler(), FakeScheduler())
+            .maxExpiry(java.time.Duration.ofMillis(5000))
+            .build()
         val inv = TestInvite(inviterId = a, invitedId = b, expiresAt = 1000)
 
         assertEquals(InvitationManager.SendResult.Accepted(inv.id), m.send(inv))
@@ -754,7 +761,11 @@ class InvitationManagerTest {
         var nowMillis = 0L
         val store = InvitationStore.InMemory<TestInvite>()
         val h = RecordingHandler()
-        val m = InvitationManager.builder(h, FakeScheduler()).store(store).clock { nowMillis }.build()
+        val m = InvitationManager
+            .builder(h, FakeScheduler())
+            .store(store)
+            .clock { nowMillis }
+            .build()
         val inv = TestInvite(inviterId = a, invitedId = b, expiresAt = 1000)
         m.send(inv)
         assertEquals(listOf("send"), h.events)

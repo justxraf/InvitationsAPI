@@ -19,7 +19,9 @@ private class TestScheduler : Scheduler {
         Task(clock + delayMillis, block).also { tasks += it }
     fun advance(millis: Long) {
         clock += millis
-        tasks.filter { !it.cancelled && it.fireAtMillis <= clock }.also { tasks.removeAll(it.toSet()) }
+        tasks
+            .filter { !it.cancelled && it.fireAtMillis <= clock }
+            .also { tasks.removeAll(it.toSet()) }
             .forEach { it.block() }
     }
 }
@@ -174,7 +176,8 @@ class ObservabilityTest {
         val handler = object : InvitationHandler<ObservedInvite> {
             override fun onSend(invitation: ObservedInvite) = throw IllegalStateException("hook failed")
         }
-        val m = InvitationManager.builder(handler, TestScheduler())
+        val m = InvitationManager
+            .builder(handler, TestScheduler())
             .errorPolicy(LifecycleErrorPolicy.PROPAGATE)
             .build()
 

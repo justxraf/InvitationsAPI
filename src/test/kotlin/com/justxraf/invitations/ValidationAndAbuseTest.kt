@@ -1,7 +1,6 @@
 package com.justxraf.invitations
 
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertSame
@@ -42,11 +41,17 @@ class ValidationAndAbuseTest {
         scheduler: Scheduler = ClockScheduler(),
         build: InvitationManager.Builder<Invite>.() -> Unit = {},
     ): InvitationManager<Invite> =
-        InvitationManager.builder(handler, scheduler).selfInvitePolicy(SelfInvitePolicy.ALLOW).apply(build).build()
+        InvitationManager
+            .builder(handler, scheduler)
+            .selfInvitePolicy(SelfInvitePolicy.ALLOW)
+            .apply(build)
+            .build()
 
     @Test fun `rejection reason renders fallback with args`() {
         val r = RejectionReason(
-            RejectionReason.Code.PARTY_FULL, "k", "Full ({current}/{max}).",
+            RejectionReason.Code.PARTY_FULL,
+            "k",
+            "Full ({current}/{max}).",
             mapOf("current" to "4", "max" to "4"),
         )
         assertEquals("Full (4/4).", r.renderFallback())
@@ -271,8 +276,12 @@ class ValidationAndAbuseTest {
     @Test fun `pair cooldown is runtime-only and does not survive a fresh manager over the same store`() {
         val store = InvitationStore.InMemory<Invite>()
         val sched = ClockScheduler()
-        val first = InvitationManager.builder(handler, sched)
-            .selfInvitePolicy(SelfInvitePolicy.ALLOW).store(store).pairCooldownMillis(1000).build()
+        val first = InvitationManager
+            .builder(handler, sched)
+            .selfInvitePolicy(SelfInvitePolicy.ALLOW)
+            .store(store)
+            .pairCooldownMillis(1000)
+            .build()
         val sent = first.send(Invite(inviterId = a, invitedId = b)) as InvitationManager.SendResult.Accepted
         first.cancelDetailed(sent.invitationId)
         assertInstanceOf(
@@ -280,8 +289,12 @@ class ValidationAndAbuseTest {
             first.send(Invite(inviterId = a, invitedId = b)),
         )
         // A new manager rehydrating the same store starts with no cooldown memory — by design.
-        val second = InvitationManager.builder(handler, sched)
-            .selfInvitePolicy(SelfInvitePolicy.ALLOW).store(store).pairCooldownMillis(1000).build()
+        val second = InvitationManager
+            .builder(handler, sched)
+            .selfInvitePolicy(SelfInvitePolicy.ALLOW)
+            .store(store)
+            .pairCooldownMillis(1000)
+            .build()
         second.rehydrate()
         assertInstanceOf(
             InvitationManager.SendResult.Accepted::class.java,

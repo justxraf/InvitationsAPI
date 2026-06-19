@@ -2,8 +2,8 @@ package com.justxraf.invitations
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.nio.file.Path
 import java.util.UUID
@@ -47,7 +47,9 @@ class JsonFileStoreTest {
         expiresAt = expiresAt,
     )
 
-    @Test fun `saved invitations survive a reopen of the file`(@TempDir dir: Path) {
+    @Test fun `saved invitations survive a reopen of the file`(
+        @TempDir dir: Path,
+    ) {
         val file = File(dir.toFile(), "invites.json")
         val first = invite(note = "line1\nline2 \"quoted\" \\slash\t tab")
         val second = invite(expiresAt = null)
@@ -57,7 +59,9 @@ class JsonFileStoreTest {
         assertEquals(setOf(first, second), reopened.load().toSet())
     }
 
-    @Test fun `remove deletes from the file`(@TempDir dir: Path) {
+    @Test fun `remove deletes from the file`(
+        @TempDir dir: Path,
+    ) {
         val file = File(dir.toFile(), "invites.json")
         val keep = invite(); val drop = invite()
         val store = JsonFileStore(file, StoredInviteSerializer)
@@ -68,12 +72,16 @@ class JsonFileStoreTest {
         assertEquals(listOf(keep), JsonFileStore(file, StoredInviteSerializer).load())
     }
 
-    @Test fun `a missing file loads as empty`(@TempDir dir: Path) {
+    @Test fun `a missing file loads as empty`(
+        @TempDir dir: Path,
+    ) {
         val store = JsonFileStore(File(dir.toFile(), "nested/invites.json"), StoredInviteSerializer)
         assertTrue(store.load().isEmpty())
     }
 
-    @Test fun `manager rehydrates from a file store across a simulated restart`(@TempDir dir: Path) {
+    @Test fun `manager rehydrates from a file store across a simulated restart`(
+        @TempDir dir: Path,
+    ) {
         val file = File(dir.toFile(), "invites.json")
         val inviter = UUID.randomUUID(); val invited = UUID.randomUUID()
         val live = StoredInvite(UUID.randomUUID(), inviter, invited, "x", createdAt = 0, expiresAt = 10_000)
@@ -84,13 +92,15 @@ class JsonFileStoreTest {
                 object : Scheduler.Cancellable { override fun cancel() {} }
         }
         val m1 = InvitationManager(
-            object : InvitationHandler<StoredInvite> {}, sched1,
+            object : InvitationHandler<StoredInvite> {},
+            sched1,
             store = JsonFileStore(file, StoredInviteSerializer),
         )
         m1.send(live)
         m1.shutdown()
         val m2 = InvitationManager(
-            object : InvitationHandler<StoredInvite> {}, sched1,
+            object : InvitationHandler<StoredInvite> {},
+            sched1,
             store = JsonFileStore(file, StoredInviteSerializer),
         )
         assertEquals(1, m2.rehydrate())

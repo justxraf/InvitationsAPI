@@ -89,7 +89,7 @@ class InvitationManager<T : Invitation>(
      */
     fun isHealthy(): Boolean = healthy
 // Logging, metrics and audit hooks ride the same observer path as user code.
-private val observers: List<InvitationObserver<T>> = buildList {
+    private val observers: List<InvitationObserver<T>> = buildList {
         addAll(observers)
         if (logger !== InvitationLogger.Noop) add(LoggingObserver(logger))
         if (metrics !== InvitationMetrics.Noop) add(MetricsObserver(metrics))
@@ -240,6 +240,7 @@ private val observers: List<InvitationObserver<T>> = buildList {
         fireHook(invitation, InvitationAction.SENT, actor = actor) { handler.onSend(it) }
         return SendResult.Accepted(invitation.id)
     }
+
     /** Accept by id. @return `true` if it was accepted, `false` if not found or vetoed. */
     @JvmOverloads
     fun accept(invitationId: UUID, actor: ActorContext? = null): Boolean =
@@ -268,6 +269,7 @@ private val observers: List<InvitationObserver<T>> = buildList {
             ConsumeOutcome.VETOED -> AcceptResult.Vetoed
             ConsumeOutcome.NOT_FOUND -> AcceptResult.NotFound
         }
+
     /** Accept the invitation between this pair, returning a detailed [AcceptResult]. */
     @JvmOverloads
     fun acceptDetailed(inviterId: UUID, invitedId: UUID, actor: ActorContext? = null): AcceptResult {
@@ -283,12 +285,15 @@ private val observers: List<InvitationObserver<T>> = buildList {
             ConsumeOutcome.VETOED -> DenyResult.Vetoed
             ConsumeOutcome.NOT_FOUND -> DenyResult.NotFound
         }
+
     /** Cancel/revoke by id (reason `REVOKED`), returning a detailed [CancelResult]. */
     @JvmOverloads
     fun cancelDetailed(invitationId: UUID, actor: ActorContext? = null): CancelResult =
-        when (consume(invitationId, InvitationAction.CANCELLED, CancelReason.REVOKED, startsPairCooldown = true, actor = actor) {
-            handler.onCancel(it, CancelReason.REVOKED)
-        }) {
+        when (
+            consume(invitationId, InvitationAction.CANCELLED, CancelReason.REVOKED, startsPairCooldown = true, actor = actor) {
+                handler.onCancel(it, CancelReason.REVOKED)
+            }
+        ) {
             ConsumeOutcome.CONSUMED -> CancelResult.Cancelled(invitationId)
             ConsumeOutcome.VETOED -> CancelResult.Vetoed
             ConsumeOutcome.NOT_FOUND -> CancelResult.NotFound
@@ -338,6 +343,7 @@ private val observers: List<InvitationObserver<T>> = buildList {
         }
         return CancelResult.Cancelled(invitationId)
     }
+
     /** Like [clearAllFor] but with reason `ADMIN_CLEARED`, for admin tooling. */
     @JvmOverloads
     fun adminClearAllFor(playerId: UUID, admin: ActorContext = ActorContext.ADMIN): Int =
@@ -401,8 +407,9 @@ private val observers: List<InvitationObserver<T>> = buildList {
         var stillPending = 0
         for (invitation in kept) {
             val freshlyIndexed = synchronized(lock) {
-                if (byId.containsKey(invitation.id)) false
-                else { index(invitation); true }
+                if (byId.containsKey(invitation.id)) {
+                    false
+                } else { index(invitation); true }
             }
             if (!freshlyIndexed) continue
             if (scheduleExpiry(invitation)) stillPending++
@@ -453,7 +460,11 @@ private val observers: List<InvitationObserver<T>> = buildList {
 
         if (rehydratePolicy.dropDuplicateIds) {
             val seen = HashSet<UUID>()
-            rows = rows.filter { if (seen.add(it.id)) true else { dropped += it.id; false } }
+            rows = rows.filter {
+                if (seen.add(it.id)) {
+                    true
+                } else { dropped += it.id; false }
+            }
         }
         if (rehydratePolicy.dropDuplicatePairs) {
             val byPair = HashMap<Pair<UUID, UUID>, T>()
@@ -471,18 +482,25 @@ private val observers: List<InvitationObserver<T>> = buildList {
         }
         return rows to dropped
     }
-private inline fun enforceCapOnLoad(rows: List<T>, cap: Int?, dropped: MutableList<UUID>, keyOf: (T) -> UUID): List<T> {
+    private inline fun enforceCapOnLoad(rows: List<T>, cap: Int?, dropped: MutableList<UUID>, keyOf: (T) -> UUID): List<T> {
         if (cap == null) return rows
         val counts = HashMap<UUID, Int>()
         val keep = LinkedHashSet<UUID>()
         for (inv in rows.sortedByDescending { it.createdAt }) {
             val key = keyOf(inv)
             val n = counts.getOrDefault(key, 0)
-            if (n < cap) { counts[key] = n + 1; keep += inv.id } else dropped += inv.id
+            if (n < cap) { counts[key] = n + 1; keep += inv.id } else {
+                dropped += inv.id
+            }
         }
         return rows.filter { it.id in keep }
     }
-fun shutdown() {
+    /**
+     * Cancel all expiry/warning timers and close the backing [InvitationStore]. Call on plugin
+     * disable. Does not fire cancel hooks for the still-pending invitations — they remain persisted and
+     * reappear on the next [rehydrate].
+     */
+    fun shutdown() {
         timers.values.forEach { it.cancel() }
         timers.clear()
         warningTimers.values.forEach { batch -> batch.forEach { it.cancel() } }
@@ -507,8 +525,8 @@ fun shutdown() {
             fireHook(invitation, InvitationAction.SENT, actor = actor) { handler.onSend(it) }
         }
     }
-private enum class ConsumeOutcome { CONSUMED, NOT_FOUND, VETOED }
-private fun consume(
+    private enum class ConsumeOutcome { CONSUMED, NOT_FOUND, VETOED }
+    private fun consume(
         invitationId: UUID,
         action: InvitationAction,
         cancelReason: CancelReason? = null,
@@ -531,7 +549,7 @@ private fun consume(
         return ConsumeOutcome.CONSUMED
     }
 // Store writes all pass through here so the selected failure policy behaves consistently.
-private inline fun storeWrite(op: String, write: () -> Unit) {
+    private inline fun storeWrite(op: String, write: () -> Unit) {
         val attempts = when (storeFailurePolicy) {
             StoreFailurePolicy.FAIL_BEFORE_MUTATING -> 1
             else -> storeWriteRetries + 1
@@ -562,11 +580,11 @@ private inline fun storeWrite(op: String, write: () -> Unit) {
     private fun storeSave(invitation: T) = storeWrite("save") { store.save(invitation) }
 
     private fun storeRemove(id: UUID) = storeWrite("remove") { store.remove(id) }
-private fun storeRemoveAll(ids: Collection<UUID>) {
+    private fun storeRemoveAll(ids: Collection<UUID>) {
         if (ids.isEmpty()) return
         storeWrite("removeAll") { store.removeAll(ids) }
     }
-private fun storeReplace(old: UUID, new: T) = storeWrite("replace") { store.replace(old, new) }
+    private fun storeReplace(old: UUID, new: T) = storeWrite("replace") { store.replace(old, new) }
 
     private inline fun <R> guardStore(op: String, block: () -> R): R {
         try {
@@ -577,7 +595,7 @@ private fun storeReplace(old: UUID, new: T) = storeWrite("replace") { store.repl
             throw t
         }
     }
-private fun consumeAll(
+    private fun consumeAll(
         ids: Set<UUID>,
         action: InvitationAction,
         cancelReason: CancelReason? = null,
@@ -596,7 +614,7 @@ private fun consumeAll(
         }
         return removed.size
     }
-private fun clearMatching(reason: CancelReason, actor: ActorContext? = null, select: () -> Set<UUID>): Int {
+    private fun clearMatching(reason: CancelReason, actor: ActorContext? = null, select: () -> Set<UUID>): Int {
         val cleared = synchronized(lock) {
             select().mapNotNull { id ->
                 unindex(id)?.also { recordCooldown(it.inviterId, it.invitedId) }
@@ -609,11 +627,11 @@ private fun clearMatching(reason: CancelReason, actor: ActorContext? = null, sel
         }
         return cleared.size
     }
-private fun cancelTimers(invitationId: UUID) {
+    private fun cancelTimers(invitationId: UUID) {
         timers.remove(invitationId)?.cancel()
         warningTimers.remove(invitationId)?.forEach { it.cancel() }
     }
-private fun scheduleExpiry(invitation: T): Boolean {
+    private fun scheduleExpiry(invitation: T): Boolean {
         val expiresAt = invitation.expiresAt ?: return true
         val delay = expiresAt - scheduler.now()
         if (delay <= 0) {
@@ -638,7 +656,7 @@ private fun scheduleExpiry(invitation: T): Boolean {
         return true
     }
 // Warning timers are best-effort. If the invite is gone when one fires, there is nothing to warn about.
-private fun scheduleExpiryWarnings(invitation: T, expiresAt: Long) {
+    private fun scheduleExpiryWarnings(invitation: T, expiresAt: Long) {
         if (expiryWarningOffsetsMillis.isEmpty()) return
         for (offset in expiryWarningOffsetsMillis) {
             if (offset <= 0) continue
@@ -655,11 +673,11 @@ private fun scheduleExpiryWarnings(invitation: T, expiresAt: Long) {
     }
 
     private fun dispatch(block: () -> Unit) = scheduler.runOnMainThread(block)
-private fun isVetoed(invitation: T, action: InvitationAction, cancelReason: CancelReason? = null): Boolean {
+    private fun isVetoed(invitation: T, action: InvitationAction, cancelReason: CancelReason? = null): Boolean {
         for (veto in vetoes) if (veto.isVetoed(invitation, action, cancelReason)) return true
         return false
     }
-private fun notifyObservers(
+    private fun notifyObservers(
         invitation: T,
         action: InvitationAction,
         cancelReason: CancelReason? = null,
@@ -674,7 +692,7 @@ private fun notifyObservers(
             }
         }
     }
-private inline fun guarded(invitation: T, action: InvitationAction, block: () -> Unit) {
+    private inline fun guarded(invitation: T, action: InvitationAction, block: () -> Unit) {
         try {
             block()
         } catch (t: Throwable) {
@@ -687,7 +705,7 @@ private inline fun guarded(invitation: T, action: InvitationAction, block: () ->
             if (errorPolicy == LifecycleErrorPolicy.PROPAGATE) throw t
         }
     }
-private fun fireHook(
+    private fun fireHook(
         invitation: T,
         action: InvitationAction,
         cancelReason: CancelReason? = null,
@@ -709,14 +727,16 @@ private fun fireHook(
         byInviter[invitation.inviterId]?.apply { remove(invitationId); if (isEmpty()) byInviter.remove(invitation.inviterId) }
         return invitation
     }
-private fun List<T>.sortedBy(sort: SortOrder?): List<T> = when (sort) {
+    private fun List<T>.sortedBy(sort: SortOrder?): List<T> = when (sort) {
         null -> this
         SortOrder.NEWEST_FIRST -> sortedByDescending { it.createdAt }
         SortOrder.OLDEST_FIRST -> sortedBy { it.createdAt }
     }
 
     private fun findPair(inviterId: UUID, invitedId: UUID): T? =
-        byInviter[inviterId].orEmpty().asSequence()
+        byInviter[inviterId]
+            .orEmpty()
+            .asSequence()
             .mapNotNull { byId[it] }
             .firstOrNull { it.invitedId == invitedId }
 
@@ -746,13 +766,19 @@ private fun List<T>.sortedBy(sort: SortOrder?): List<T> = when (sort) {
     )
 
     companion object {
-@JvmStatic
+        /** Entry point for the Java-friendly [Builder]; [handler] and [scheduler] are required. */
+        @JvmStatic
         fun <T : Invitation> builder(
             handler: InvitationHandler<T>,
             scheduler: Scheduler,
         ): Builder<T> = Builder(handler, scheduler)
     }
-class Builder<T : Invitation> internal constructor(
+
+    /**
+     * Fluent, Java-friendly builder for [InvitationManager]. Every option has a safe default, so new
+     * options can be added without breaking callers. Obtain one via [InvitationManager.builder].
+     */
+    class Builder<T : Invitation> internal constructor(
         private val handler: InvitationHandler<T>,
         private val scheduler: Scheduler,
     ) {
@@ -778,8 +804,11 @@ class Builder<T : Invitation> internal constructor(
         private var requireExpiry: Boolean = false
         private var maxExpiryMillis: Long? = null
         private var clock: Clock? = null
-fun maxPerInviter(limit: Int?): Builder<T> = apply { this.maxPerInviter = limit }
-fun maxPerInvited(limit: Int?): Builder<T> = apply { this.maxPerInvited = limit }
+        /** Cap simultaneous pending invitations *from* one inviter. `null` = unlimited. */
+        fun maxPerInviter(limit: Int?): Builder<T> = apply { this.maxPerInviter = limit }
+
+        /** Cap simultaneous pending invitations *to* one invited player. `null` = unlimited. */
+        fun maxPerInvited(limit: Int?): Builder<T> = apply { this.maxPerInvited = limit }
 /**
          * Cooldown applied to an (inviter, invited) pair after a deny, cancel, expire, or duplicate
          * attempt, blocking re-sends with [SendResult.CooldownActive] until it elapses.
@@ -789,30 +818,63 @@ fun maxPerInvited(limit: Int?): Builder<T> = apply { this.maxPerInvited = limit 
          * survives restarts, back a [ValidationPolicy] with your own durable store instead.
          */
         fun pairCooldownMillis(millis: Long?): Builder<T> = apply { this.pairCooldownMillis = millis }
-fun duplicatePolicy(policy: DuplicatePolicy): Builder<T> = apply { this.duplicatePolicy = policy }
-fun selfInvitePolicy(policy: SelfInvitePolicy): Builder<T> = apply { this.selfInvitePolicy = policy }
-fun validationPolicy(policy: ValidationPolicy<T>): Builder<T> = apply { this.validationPolicies += policy }
-fun rateLimiter(limiter: RateLimiter?): Builder<T> = apply { this.rateLimiter = limiter }
-fun rateLimits(
+        /** How to handle a second invite for an existing pair. See [DuplicatePolicy]. */
+        fun duplicatePolicy(policy: DuplicatePolicy): Builder<T> = apply { this.duplicatePolicy = policy }
+
+        /** Whether inviter == invited is rejected or allowed. See [SelfInvitePolicy]. */
+        fun selfInvitePolicy(policy: SelfInvitePolicy): Builder<T> = apply { this.selfInvitePolicy = policy }
+
+        /** Add a [ValidationPolicy] run on every send; may be called repeatedly to chain rules. */
+        fun validationPolicy(policy: ValidationPolicy<T>): Builder<T> = apply { this.validationPolicies += policy }
+
+        /** Set a pre-built [RateLimiter]. `null` disables rate limiting. */
+        fun rateLimiter(limiter: RateLimiter?): Builder<T> = apply { this.rateLimiter = limiter }
+
+        /** Convenience for building a [RateLimiter] from per-inviter/invited/pair [RateLimiter.Limit]s. */
+        fun rateLimits(
             perInviter: RateLimiter.Limit? = null,
             perInvited: RateLimiter.Limit? = null,
             perPair: RateLimiter.Limit? = null,
         ): Builder<T> = apply {
             this.rateLimiter = RateLimiter(perInviter, perInvited, perPair) { scheduler.now() }
         }
-fun expiryWarningOffsetsMillis(vararg offsetsMillis: Long): Builder<T> =
+
+        /** Offsets-before-expiry (in millis) at which [InvitationHandler.onExpiryWarning] fires. */
+        fun expiryWarningOffsetsMillis(vararg offsetsMillis: Long): Builder<T> =
             apply { this.expiryWarningOffsetsMillis = offsetsMillis.toList() }
-fun store(store: InvitationStore<T>): Builder<T> = apply { this.store = store }
-fun observer(observer: InvitationObserver<T>): Builder<T> = apply { this.observers += observer }
-fun veto(veto: InvitationVeto<T>): Builder<T> = apply { this.vetoes += veto }
-fun logger(logger: InvitationLogger): Builder<T> = apply { this.logger = logger }
-fun metrics(metrics: InvitationMetrics): Builder<T> = apply { this.metrics = metrics }
-fun audit(audit: InvitationAudit): Builder<T> = apply { this.audit = audit }
-fun errorPolicy(policy: LifecycleErrorPolicy): Builder<T> = apply { this.errorPolicy = policy }
-fun errorCallback(callback: LifecycleErrorCallback<T>): Builder<T> = apply { this.errorCallback = callback }
-fun storeFailurePolicy(policy: StoreFailurePolicy): Builder<T> = apply { this.storeFailurePolicy = policy }
-fun storeWriteRetries(retries: Int): Builder<T> = apply { this.storeWriteRetries = retries }
-fun rehydratePolicy(policy: RehydratePolicy): Builder<T> = apply { this.rehydratePolicy = policy }
+
+        /** Set the persistence backend. Defaults to [InvitationStore.InMemory]. */
+        fun store(store: InvitationStore<T>): Builder<T> = apply { this.store = store }
+
+        /** Register a lifecycle [InvitationObserver]; may be called repeatedly. */
+        fun observer(observer: InvitationObserver<T>): Builder<T> = apply { this.observers += observer }
+
+        /** Register a pre-mutation [InvitationVeto]; may be called repeatedly. */
+        fun veto(veto: InvitationVeto<T>): Builder<T> = apply { this.vetoes += veto }
+
+        /** Attach a logger; wired internally as a [LoggingObserver]. */
+        fun logger(logger: InvitationLogger): Builder<T> = apply { this.logger = logger }
+
+        /** Attach a metrics sink; wired internally as a [MetricsObserver]. */
+        fun metrics(metrics: InvitationMetrics): Builder<T> = apply { this.metrics = metrics }
+
+        /** Attach an audit sink; wired internally as an [AuditObserver]. */
+        fun audit(audit: InvitationAudit): Builder<T> = apply { this.audit = audit }
+
+        /** Whether callback exceptions are isolated or propagated. See [LifecycleErrorPolicy]. */
+        fun errorPolicy(policy: LifecycleErrorPolicy): Builder<T> = apply { this.errorPolicy = policy }
+
+        /** Callback invoked whenever a hook/observer throws, regardless of [errorPolicy]. */
+        fun errorCallback(callback: LifecycleErrorCallback<T>): Builder<T> = apply { this.errorCallback = callback }
+
+        /** How store write failures are handled. See [StoreFailurePolicy]. */
+        fun storeFailurePolicy(policy: StoreFailurePolicy): Builder<T> = apply { this.storeFailurePolicy = policy }
+
+        /** Retry attempts for store writes under retrying failure policies. */
+        fun storeWriteRetries(retries: Int): Builder<T> = apply { this.storeWriteRetries = retries }
+
+        /** How loaded rows are reconciled on [rehydrate]. See [RehydratePolicy]. */
+        fun rehydratePolicy(policy: RehydratePolicy): Builder<T> = apply { this.rehydratePolicy = policy }
 /**
          * When `true`, [send] rejects invitations that have no `expiresAt` with
          * [SendResult.ExpiryRequired]. Defaults to `false` so no-expiry (permanent) invitations remain
@@ -831,6 +893,7 @@ fun rehydratePolicy(policy: RehydratePolicy): Builder<T> = apply { this.rehydrat
          */
         fun clock(clock: Clock?): Builder<T> = apply { this.clock = clock }
 
+        /** Construct the configured [InvitationManager]. */
         fun build(): InvitationManager<T> =
             InvitationManager(
                 handler,

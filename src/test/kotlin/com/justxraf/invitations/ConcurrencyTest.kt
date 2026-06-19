@@ -22,7 +22,7 @@ private data class ConcInvite(
 ) : Invitation
 
 class ConcurrencyTest {
-private class ThreadedScheduler : Scheduler, AutoCloseable {
+    private class ThreadedScheduler : Scheduler, AutoCloseable {
         private val main = Executors.newSingleThreadExecutor()
         private val timer = Executors.newScheduledThreadPool(4)
         private val started = System.nanoTime()
@@ -35,7 +35,7 @@ private class ThreadedScheduler : Scheduler, AutoCloseable {
                 override fun cancel() { future.cancel(false) }
             }
         }
-fun drainMainThread() {
+        fun drainMainThread() {
             val done = CountDownLatch(1)
             main.execute { done.countDown() }
             check(done.await(10, TimeUnit.SECONDS)) { "main-thread queue did not drain" }
@@ -59,13 +59,19 @@ fun drainMainThread() {
         override fun onCancel(i: ConcInvite, reason: CancelReason) { cancels.incrementAndGet() }
         override fun onExpire(i: ConcInvite) { expires.incrementAndGet() }
     }
-private class TrackingStore : InvitationStore<ConcInvite> {
+    private class TrackingStore : InvitationStore<ConcInvite> {
         private val rows = LinkedHashMap<UUID, ConcInvite>()
+
         @Synchronized override fun save(invitation: ConcInvite) { rows[invitation.id] = invitation }
+
         @Synchronized override fun remove(id: UUID) { rows.remove(id) }
+
         @Synchronized override fun removeAll(ids: Collection<UUID>) { ids.forEach { rows.remove(it) } }
+
         @Synchronized override fun replace(old: UUID, new: ConcInvite) { rows.remove(old); rows[new.id] = new }
+
         @Synchronized override fun load(): List<ConcInvite> = rows.values.toList()
+
         @Synchronized fun ids(): Set<UUID> = rows.keys.toSet()
     }
 
@@ -75,12 +81,13 @@ private class TrackingStore : InvitationStore<ConcInvite> {
         store: InvitationStore<ConcInvite> = TrackingStore(),
         maxPerInviter: Int? = null,
         maxPerInvited: Int? = null,
-    ) = InvitationManager.builder(handler, scheduler)
+    ) = InvitationManager
+        .builder(handler, scheduler)
         .store(store)
         .maxPerInviter(maxPerInviter)
         .maxPerInvited(maxPerInvited)
         .build()
-private fun race(threads: Int, block: (Int) -> Unit) {
+    private fun race(threads: Int, block: (Int) -> Unit) {
         val pool = Executors.newFixedThreadPool(threads)
         val barrier = CyclicBarrier(threads)
         val done = CountDownLatch(threads)
@@ -97,7 +104,7 @@ private fun race(threads: Int, block: (Int) -> Unit) {
         check(done.await(30, TimeUnit.SECONDS)) { "threads did not finish in time" }
         pool.shutdownNow()
     }
-private fun assertConsistent(m: InvitationManager<ConcInvite>, store: TrackingStore) {
+    private fun assertConsistent(m: InvitationManager<ConcInvite>, store: TrackingStore) {
         val all = m.all()
         val ids = all.map { it.id }.toSet()
         assertEquals(ids.size, all.size, "duplicate ids leaked into byId")
@@ -262,8 +269,11 @@ private fun assertConsistent(m: InvitationManager<ConcInvite>, store: TrackingSt
             }
             Thread.sleep(100)
             sched.drainMainThread()
-            assertEquals(n, h.accepts.get() + h.expires.get(),
-                "an invite was both accepted and expired")
+            assertEquals(
+                n,
+                h.accepts.get() + h.expires.get(),
+                "an invite was both accepted and expired",
+            )
             assertEquals(0, m.pendingCount())
             assertConsistent(m, store)
         }
@@ -279,7 +289,9 @@ private fun assertConsistent(m: InvitationManager<ConcInvite>, store: TrackingSt
             seeded.forEach { store.save(it) }
             val live = (0 until 50).map { ConcInvite(inviterId = UUID.randomUUID(), invitedId = UUID.randomUUID()) }
             race(threads = 4) { t ->
-                if (t == 0) m.rehydrate() else { var i = t; while (i < live.size) { m.send(live[i]); i += 4 } }
+                if (t == 0) {
+                    m.rehydrate()
+                } else { var i = t; while (i < live.size) { m.send(live[i]); i += 4 } }
             }
             sched.drainMainThread()
             assertConsistent(m, store)
@@ -335,8 +347,11 @@ private fun assertConsistent(m: InvitationManager<ConcInvite>, store: TrackingSt
         }
         ThreadedScheduler().use { sched ->
             val m = manager(h, sched, store = TrackingStore())
-            val inv = ConcInvite(inviterId = UUID.randomUUID(), invitedId = UUID.randomUUID(),
-                expiresAt = sched.now() - 1)
+            val inv = ConcInvite(
+                inviterId = UUID.randomUUID(),
+                invitedId = UUID.randomUUID(),
+                expiresAt = sched.now() - 1,
+            )
             val result = m.send(inv)
             sched.drainMainThread()
             assertTrue(result is InvitationManager.SendResult.Accepted)
@@ -351,13 +366,18 @@ private fun assertConsistent(m: InvitationManager<ConcInvite>, store: TrackingSt
         val throwingStore = object : InvitationStore<ConcInvite> {
             private val rows = LinkedHashMap<UUID, ConcInvite>()
             private val saves = AtomicInteger()
+
             @Synchronized override fun save(invitation: ConcInvite) {
                 if (saves.incrementAndGet() % 7 == 0) throw RuntimeException("save boom")
                 rows[invitation.id] = invitation
             }
+
             @Synchronized override fun remove(id: UUID) { rows.remove(id) }
+
             @Synchronized override fun removeAll(ids: Collection<UUID>) { ids.forEach { rows.remove(it) } }
+
             @Synchronized override fun replace(old: UUID, new: ConcInvite) { rows.remove(old); rows[new.id] = new }
+
             @Synchronized override fun load(): List<ConcInvite> = rows.values.toList()
         }
         val throwingHandler = object : InvitationHandler<ConcInvite> {
@@ -365,7 +385,8 @@ private fun assertConsistent(m: InvitationManager<ConcInvite>, store: TrackingSt
             override fun onSend(i: ConcInvite) { if (n.incrementAndGet() % 5 == 0) throw RuntimeException("hook boom") }
         }
         ThreadedScheduler().use { sched ->
-            val m = InvitationManager.builder(throwingHandler, sched)
+            val m = InvitationManager
+                .builder(throwingHandler, sched)
                 .store(throwingStore)
                 .storeFailurePolicy(StoreFailurePolicy.MUTATE_THEN_RETRY)
                 .build()

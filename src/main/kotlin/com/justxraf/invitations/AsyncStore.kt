@@ -67,7 +67,7 @@ class AsyncStore<T : Invitation> @JvmOverloads constructor(
             applyOp(op)
         }
     }
-private fun drainRemaining() {
+    private fun drainRemaining() {
         val rest = ArrayList<Op<T>>()
         queue.drainTo(rest)
         for (op in rest) if (op !is Stop) applyOp(op)
@@ -88,7 +88,10 @@ private fun drainRemaining() {
         try {
             write()
         } catch (t: Throwable) {
-            try { onError(t) } catch (_: Throwable) {}
+            try {
+                onError(t)
+            } catch (_: Throwable) {
+            }
         }
     }
 

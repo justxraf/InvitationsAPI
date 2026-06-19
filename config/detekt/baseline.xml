@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:InvitationManager.kt$InvitationManager$private fun sendInternal(invitation: T, actor: ActorContext?): SendResult</ID>
+    <ID>EmptyElseBlock:ConcurrencyTest.kt$ConcurrencyTest$if (m.accept(inv.id)) winners.add(inv.id)</ID>
+    <ID>EmptyElseBlock:ConcurrencyTest.kt$ConcurrencyTest$if (m.cancel(inv.id)) winners.add(inv.id)</ID>
+    <ID>EmptyElseBlock:ConcurrencyTest.kt$ConcurrencyTest$if (m.deny(inv.id)) winners.add(inv.id)</ID>
+    <ID>EmptyFunctionBlock:JavaInvitationHandler.kt$JavaInvitationHandler${}</ID>
+    <ID>EmptyFunctionBlock:JavaSourceCompatibilityTest.kt$JavaSourceCompatibilityTest.&lt;no name provided>.&lt;no name provided>${}</ID>
+    <ID>EmptyFunctionBlock:JsonFileStoreTest.kt$JsonFileStoreTest.&lt;no name provided>.&lt;no name provided>${}</ID>
+    <ID>EmptyFunctionBlock:KotlinExamples.kt$KotlinExamples.&lt;no name provided>${ }</ID>
+    <ID>EmptyFunctionBlock:ObservabilityTest.kt$ObservabilityTest.&lt;no name provided>${}</ID>
+    <ID>EmptyFunctionBlock:PerformanceTest.kt$PerformanceTest.&lt;no name provided>.&lt;no name provided>${}</ID>
+    <ID>EmptyFunctionBlock:PersistenceDurabilityTest.kt$&lt;no name provided>.&lt;no name provided>${}</ID>
+    <ID>EmptyFunctionBlock:SqlInvitationStoreTest.kt$SqlInvitationStoreTest.&lt;no name provided>.&lt;no name provided>${}</ID>
+    <ID>LongMethod:InvitationManager.kt$InvitationManager$private fun sendInternal(invitation: T, actor: ActorContext?): SendResult</ID>
+    <ID>ReturnCount:InvitationManager.kt$InvitationManager$private fun sendInternal(invitation: T, actor: ActorContext?): SendResult</ID>
+    <ID>TooGenericExceptionCaught:AsyncStore.kt$AsyncStore$t: Throwable</ID>
+    <ID>TooGenericExceptionCaught:InvitationManager.kt$InvitationManager$t: Throwable</ID>
+    <ID>TooGenericExceptionCaught:JsonFileStore.kt$JsonFileStore$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SqlInvitationStore.kt$SqlInvitationStore$t: Throwable</ID>
+    <ID>TooGenericExceptionCaught:SqlMigrations.kt$SqlMigrations$t: Throwable</ID>
+    <ID>TooGenericExceptionThrown:ConcurrencyTest.kt$ConcurrencyTest.&lt;no name provided>$throw RuntimeException("hook boom")</ID>
+    <ID>TooGenericExceptionThrown:ConcurrencyTest.kt$ConcurrencyTest.&lt;no name provided>$throw RuntimeException("save boom")</ID>
+    <ID>TooGenericExceptionThrown:PersistenceDurabilityTest.kt$FlakyStore$throw RuntimeException("boom")</ID>
+    <ID>TooManyFunctions:BukkitAdapterExamples.kt$BukkitAdapterExamples</ID>
+    <ID>TooManyFunctions:InvitationManager.kt$InvitationManager&lt;T : Invitation></ID>
+    <ID>UseCheckOrError:ObservabilityTest.kt$ObservabilityTest.&lt;no name provided>$throw IllegalStateException("boom")</ID>
+    <ID>UseCheckOrError:ObservabilityTest.kt$ObservabilityTest.&lt;no name provided>$throw IllegalStateException("hook failed")</ID>
+  </CurrentIssues>
+</SmellBaseline>

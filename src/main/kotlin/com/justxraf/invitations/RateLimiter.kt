@@ -56,7 +56,7 @@ class RateLimiter(
         invitedHits.remove(invitedId)
         pairHits.remove(inviterId to invitedId)
     }
-private fun <K> peek(map: ConcurrentHashMap<K, Window>, key: K, limit: Limit, now: Long): Long? {
+    private fun <K> peek(map: ConcurrentHashMap<K, Window>, key: K, limit: Limit, now: Long): Long? {
         val window = map[key] ?: return null
         synchronized(window) {
             window.prune(now - limit.windowMillis)
@@ -72,7 +72,7 @@ private fun <K> peek(map: ConcurrentHashMap<K, Window>, key: K, limit: Limit, no
             window.add(now)
         }
     }
-private class Window {
+    private class Window {
         private val timestamps = ArrayDeque<Long>()
         fun prune(before: Long) { while (timestamps.isNotEmpty() && timestamps.first() <= before) timestamps.removeFirst() }
         fun add(now: Long) = timestamps.addLast(now)

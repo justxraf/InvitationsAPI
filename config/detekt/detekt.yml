@@ -1,0 +1,45 @@
+# Detekt configuration for InvitationsAPI.
+# Builds upon the default rule set (buildUponDefaultConfig = true); this file only tunes the rules
+# that would otherwise produce noise for this codebase's deliberate style. Keep it small — prefer
+# fixing code over suppressing rules.
+
+build:
+  maxIssues: 0
+
+# Style/formatting is owned by ktlint (see .editorconfig). Detekt's formatting ruleset wraps the same
+# ktlint engine, so enabling it here would double-report and fight the layout rules we deliberately
+# relaxed for this codebase. Keep detekt focused on code smells only.
+formatting:
+  active: false
+
+complexity:
+  # The manager is intentionally a large, cohesive engine class; these defaults are too tight for it.
+  LongMethod:
+    threshold: 80
+  LongParameterList:
+    # InvitationManager's constructor and Builder.build() pass every option explicitly.
+    functionThreshold: 24
+    constructorThreshold: 28
+  TooManyFunctions:
+    thresholdInClasses: 40
+    thresholdInFiles: 40
+  CyclomaticComplexMethod:
+    threshold: 20
+  NestedBlockDepth:
+    threshold: 5
+
+style:
+  MaxLineLength:
+    maxLineLength: 140
+  ReturnCount:
+    max: 8
+  # Sealed result hierarchies legitimately use data classes/objects without explicit visibility.
+  MagicNumber:
+    active: false
+  LoopWithTooManyJumpStatements:
+    active: false
+
+naming:
+  # Test method names use backtick `with spaces`.
+  FunctionNaming:
+    excludes: ['**/test/**']

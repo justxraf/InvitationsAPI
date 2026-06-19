@@ -57,7 +57,12 @@ class SqlInvitationStoreTest {
     )
 
     private fun invite(note: String = "hi", expiresAt: Long? = 5000) = SqlInvite(
-        UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), note, createdAt = 1000, expiresAt = expiresAt,
+        UUID.randomUUID(),
+        UUID.randomUUID(),
+        UUID.randomUUID(),
+        note,
+        createdAt = 1000,
+        expiresAt = expiresAt,
     )
 
     @Test fun `save then load round-trips every field including a null expiry and tricky chars`() {
