@@ -26,7 +26,7 @@ private class TestScheduler : Scheduler {
     }
 }
 
-private data class Invite(
+private data class ObservedInvite(
     override val id: UUID = UUID.randomUUID(),
     override val inviterId: UUID,
     override val invitedId: UUID,
@@ -39,17 +39,17 @@ class ObservabilityTest {
     private val b = UUID.randomUUID()
 
     private fun manager(
-        block: InvitationManager.Builder<Invite>.() -> Unit = {},
+        block: InvitationManager.Builder<ObservedInvite>.() -> Unit = {},
         scheduler: Scheduler = TestScheduler(),
-    ): InvitationManager<Invite> =
-        InvitationManager.builder(object : InvitationHandler<Invite> {}, scheduler).apply(block).build()
+    ): InvitationManager<ObservedInvite> =
+        InvitationManager.builder(object : InvitationHandler<ObservedInvite> {}, scheduler).apply(block).build()
 
     // --- observer seam ----------------------------------------------------------------------
 
     @Test fun `observer sees one event per lifecycle transition`() {
         val seen = mutableListOf<InvitationAction>()
         val m = manager({ observer { seen += it.action } })
-        val inv = Invite(inviterId = a, invitedId = b)
+        val inv = ObservedInvite(inviterId = a, invitedId = b)
 
         m.send(inv)
         m.accept(inv.id)
@@ -58,10 +58,10 @@ class ObservabilityTest {
     }
 
     @Test fun `observer event carries cancel reason and timestamp`() {
-        var event: LifecycleEvent<Invite>? = null
+        var event: LifecycleEvent<ObservedInvite>? = null
         val sched = TestScheduler().also { it.advance(1000) }
         val m = manager({ observer { event = it } }, scheduler = sched)
-        val inv = Invite(inviterId = a, invitedId = b)
+        val inv = ObservedInvite(inviterId = a, invitedId = b)
         m.send(inv)
 
         m.clearAllFor(a, CancelReason.PLAYER_QUIT)
@@ -77,9 +77,9 @@ class ObservabilityTest {
             duplicatePolicy(DuplicatePolicy.REPLACE_EXISTING)
             observer { if (it.action == InvitationAction.REPLACED) replaced += it.replacedId!! }
         })
-        val first = Invite(inviterId = a, invitedId = b)
+        val first = ObservedInvite(inviterId = a, invitedId = b)
         m.send(first)
-        m.send(Invite(inviterId = a, invitedId = b))
+        m.send(ObservedInvite(inviterId = a, invitedId = b))
 
         assertEquals(listOf(first.id), replaced)
     }
@@ -88,7 +88,7 @@ class ObservabilityTest {
 
     @Test fun `veto blocks accept and yields a Vetoed result`() {
         val m = manager({ veto { _, action, _ -> action == InvitationAction.ACCEPTED } })
-        val inv = Invite(inviterId = a, invitedId = b)
+        val inv = ObservedInvite(inviterId = a, invitedId = b)
         m.send(inv)
 
         assertEquals(AcceptResult.Vetoed, m.acceptDetailed(inv.id))
@@ -100,7 +100,7 @@ class ObservabilityTest {
     @Test fun `veto blocks send before registration`() {
         val m = manager({ veto { _, action, _ -> action == InvitationAction.SENT } })
 
-        assertEquals(InvitationManager.SendResult.Vetoed, m.send(Invite(inviterId = a, invitedId = b)))
+        assertEquals(InvitationManager.SendResult.Vetoed, m.send(ObservedInvite(inviterId = a, invitedId = b)))
         assertEquals(0, m.pendingCount())
     }
 
@@ -112,7 +112,7 @@ class ObservabilityTest {
                 false
             }
         })
-        val inv = Invite(inviterId = a, invitedId = b)
+        val inv = ObservedInvite(inviterId = a, invitedId = b)
         m.send(inv)
         m.cancel(inv.id)
 
@@ -124,12 +124,12 @@ class ObservabilityTest {
     @Test fun `metrics count lifecycle transitions and send outcomes`() {
         val metrics = InvitationMetrics.InMemory()
         val m = manager({ metrics(metrics) })
-        val inv = Invite(inviterId = a, invitedId = b)
+        val inv = ObservedInvite(inviterId = a, invitedId = b)
 
         m.send(inv)
         m.accept(inv.id)
-        m.send(Invite(inviterId = a, invitedId = b)) // accepted: new pair
-        m.send(Invite(inviterId = a, invitedId = b)) // duplicate of the above
+        m.send(ObservedInvite(inviterId = a, invitedId = b)) // accepted: new pair
+        m.send(ObservedInvite(inviterId = a, invitedId = b)) // duplicate of the above
 
         val snap = metrics.snapshot()
         assertEquals(2, snap.sent)
@@ -139,14 +139,14 @@ class ObservabilityTest {
 
     @Test fun `metrics count store failures`() {
         val metrics = InvitationMetrics.InMemory()
-        val failingStore = object : InvitationStore<Invite> {
-            override fun save(invitation: Invite) = throw IllegalStateException("boom")
+        val failingStore = object : InvitationStore<ObservedInvite> {
+            override fun save(invitation: ObservedInvite) = throw IllegalStateException("boom")
             override fun remove(invitationId: UUID) {}
-            override fun load(): List<Invite> = emptyList()
+            override fun load(): List<ObservedInvite> = emptyList()
         }
         val m = manager({ metrics(metrics); store(failingStore) })
 
-        runCatching { m.send(Invite(inviterId = a, invitedId = b)) }
+        runCatching { m.send(ObservedInvite(inviterId = a, invitedId = b)) }
 
         assertEquals(1, metrics.snapshot().storeFailures)
     }
@@ -156,7 +156,7 @@ class ObservabilityTest {
     @Test fun `audit records structured entries`() {
         val entries = mutableListOf<AuditEntry>()
         val m = manager({ audit { entries += it } })
-        val inv = Invite(inviterId = a, invitedId = b, createdAt = 5)
+        val inv = ObservedInvite(inviterId = a, invitedId = b, createdAt = 5)
         m.send(inv)
         m.deny(inv.id)
 
@@ -179,21 +179,21 @@ class ObservabilityTest {
         })
 
         // send must not throw despite the faulty observer
-        m.send(Invite(inviterId = a, invitedId = b))
+        m.send(ObservedInvite(inviterId = a, invitedId = b))
 
         assertEquals(listOf("second"), ran)
         assertEquals(listOf(InvitationAction.SENT), errors)
     }
 
     @Test fun `PROPAGATE rethrows a throwing handler hook`() {
-        val handler = object : InvitationHandler<Invite> {
-            override fun onSend(invitation: Invite) = throw IllegalStateException("hook failed")
+        val handler = object : InvitationHandler<ObservedInvite> {
+            override fun onSend(invitation: ObservedInvite) = throw IllegalStateException("hook failed")
         }
         val m = InvitationManager.builder(handler, TestScheduler())
             .errorPolicy(LifecycleErrorPolicy.PROPAGATE)
             .build()
 
-        val threw = runCatching { m.send(Invite(inviterId = a, invitedId = b)) }.isFailure
+        val threw = runCatching { m.send(ObservedInvite(inviterId = a, invitedId = b)) }.isFailure
         assertTrue(threw)
     }
 
@@ -202,7 +202,7 @@ class ObservabilityTest {
     @Test fun `logger emits a line per transition`() {
         val lines = mutableListOf<String>()
         val m = manager({ logger { _, message, _ -> lines += message } })
-        val inv = Invite(inviterId = a, invitedId = b)
+        val inv = ObservedInvite(inviterId = a, invitedId = b)
         m.send(inv)
         m.accept(inv.id)
 
