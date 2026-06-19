@@ -1,9 +1,5 @@
 # ADR 0001 — The core has no Bukkit dependency
 
-- **Status:** Accepted
-- **Date:** 2026-06-19
-- **Deciders:** InvitationsAPI maintainers
-
 ## Context
 
 InvitationsAPI is the shared invitation engine intended for adoption by IslandCore, SkyblockAPI, and
