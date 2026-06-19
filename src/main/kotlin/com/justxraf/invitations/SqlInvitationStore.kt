@@ -12,6 +12,7 @@ class SqlInvitationStore<T : Invitation> @JvmOverloads constructor(
 ) : InvitationStore<T> {
 
     init {
+        // The table name is interpolated into SQL, so keep it stricter than a normal config string.
         require(table.matches(Regex("[A-Za-z_][A-Za-z0-9_]*"))) { "Unsafe table name: $table" }
         withConnection { conn -> SqlMigrations.migrate(conn, dialect, table) }
     }
@@ -52,6 +53,7 @@ class SqlInvitationStore<T : Invitation> @JvmOverloads constructor(
     }
 
     override fun replace(old: UUID, new: T) {
+        // Duplicate replacement should never leave both the old and new invitations visible.
         inTransaction { conn ->
             conn.prepareStatement("DELETE FROM $table WHERE id = ?").use { ps ->
                 ps.setString(1, old.toString())

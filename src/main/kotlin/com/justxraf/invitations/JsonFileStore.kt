@@ -24,6 +24,7 @@ class JsonFileStore<T : Invitation> @JvmOverloads constructor(
     private val lockHandle: LockHandle? = if (lockFile) acquireLock(file) else null
 
     init {
+        // Load once on startup; after that the map is the live copy and flush() writes snapshots.
         if (file.exists()) {
             val text = file.readText(StandardCharsets.UTF_8)
             try {
@@ -76,6 +77,7 @@ override fun close() {
         lockHandle?.release()
     }
 private fun flush() {
+        // Swap a temp file into place so a crash is less likely to leave a half-written store.
         val text = Json.writeArray(byId.values.map { serializer.serialize(it) })
         file.parentFile?.mkdirs()
         val tmp = File(file.parentFile, "${file.name}.tmp")
@@ -126,6 +128,7 @@ private fun quarantineCorruptFile() {
             lockFile.delete()
         }
     }
+// This store only persists flat string maps, so a tiny JSON parser keeps the dependency surface small.
 private object Json {
 
         fun writeArray(objects: List<Map<String, String>>): String =

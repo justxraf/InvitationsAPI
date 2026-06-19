@@ -25,6 +25,7 @@ data class Limited(val retryAfterMillis: Long) : Decision
 fun isNoop(): Boolean = perInviter == null && perInvited == null && perPair == null
 fun tryAcquire(inviterId: UUID, invitedId: UUID): Decision {
         val now = clock()
+        // Check every bucket first; a rejected invite should not spend quota in another bucket.
         perInviter?.let { peek(inviterHits, inviterId, it, now)?.let { r -> return Decision.Limited(r) } }
         perInvited?.let { peek(invitedHits, invitedId, it, now)?.let { r -> return Decision.Limited(r) } }
         perPair?.let { peek(pairHits, inviterId to invitedId, it, now)?.let { r -> return Decision.Limited(r) } }

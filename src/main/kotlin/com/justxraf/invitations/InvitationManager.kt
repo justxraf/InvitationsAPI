@@ -25,6 +25,7 @@ class InvitationManager<T : Invitation>(
     private val storeWriteRetries: Int = 2,
     private val rehydratePolicy: RehydratePolicy = RehydratePolicy.REPAIR,
 ) {
+    // Keep the secondary indexes in step with byId; callers use all three lookup paths.
     private val byId = ConcurrentHashMap<UUID, T>()
     private val byInvited = ConcurrentHashMap<UUID, MutableSet<UUID>>()
     private val byInviter = ConcurrentHashMap<UUID, MutableSet<UUID>>()
@@ -35,6 +36,7 @@ class InvitationManager<T : Invitation>(
 
     @Volatile private var healthy = true
 fun isHealthy(): Boolean = healthy
+// Logging, metrics and audit hooks ride the same observer path as user code.
 private val observers: List<InvitationObserver<T>> = buildList {
         addAll(observers)
         if (logger !== InvitationLogger.Noop) add(LoggingObserver(logger))
@@ -92,6 +94,7 @@ class StoreWriteFailedException(message: String, cause: Throwable) : RuntimeExce
             }
         }
 
+        // Duplicate policies update the indexes under lock, then run store writes and callbacks after.
         var duplicateMutation: DuplicateMutation<T>? = null
         synchronized(lock) {
             activeCooldownRemaining(invitation.inviterId, invitation.invitedId)?.let {
@@ -278,6 +281,7 @@ private fun reconcileOnLoad(loaded: List<T>): Pair<List<T>, List<UUID>> {
         if (rehydratePolicy.dropDuplicatePairs) {
             val byPair = HashMap<Pair<UUID, UUID>, T>()
             val keep = LinkedHashSet<UUID>()
+            // If a pair was written twice, the newest row is the one players most likely saw.
             for (inv in rows.sortedByDescending { it.createdAt }) {
                 val key = inv.inviterId to inv.invitedId
                 if (byPair.putIfAbsent(key, inv) == null) keep += inv.id else dropped += inv.id
@@ -349,6 +353,7 @@ private fun consume(
         fireHook(invitation, action, cancelReason, actor, hook)
         return ConsumeOutcome.CONSUMED
     }
+// Store writes all pass through here so the selected failure policy behaves consistently.
 private inline fun storeWrite(op: String, write: () -> Unit) {
         val attempts = when (storeFailurePolicy) {
             StoreFailurePolicy.FAIL_BEFORE_MUTATING -> 1
@@ -455,6 +460,7 @@ private fun scheduleExpiry(invitation: T): Boolean {
         scheduleExpiryWarnings(invitation, expiresAt)
         return true
     }
+// Warning timers are best-effort. If the invite is gone when one fires, there is nothing to warn about.
 private fun scheduleExpiryWarnings(invitation: T, expiresAt: Long) {
         if (expiryWarningOffsetsMillis.isEmpty()) return
         for (offset in expiryWarningOffsetsMillis) {
@@ -495,6 +501,7 @@ private inline fun guarded(invitation: T, action: InvitationAction, block: () ->
         try {
             block()
         } catch (t: Throwable) {
+            // Plugin callbacks are isolated by default; server owners can opt into propagation.
             logger.error("invitation lifecycle callback for $action threw on id=${invitation.id}", t)
             try {
                 errorCallback.onLifecycleError(invitation, action, t)

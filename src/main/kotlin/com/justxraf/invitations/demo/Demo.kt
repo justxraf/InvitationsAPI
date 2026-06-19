@@ -63,6 +63,7 @@ class TeleportHandler : InvitationHandler<TeleportRequest> {
         println("  [tpa] request ${r.requesterName} -> ${r.receiverName} timed out")
 }
 
+// The demo keeps timers manual so expiry can be shown without sleeping.
 private class ImmediateScheduler : Scheduler {
     private class Task(val block: () -> Unit) : Scheduler.Cancellable {
         var cancelled = false
