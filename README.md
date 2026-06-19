@@ -41,6 +41,30 @@ See [docs/compatibility.md](docs/compatibility.md) for the full matrix.
 
 On Windows use `gradlew.bat`.
 
+## Install
+
+Released to Maven Central as `com.justxraf:invitations`.
+
+```kotlin
+// build.gradle.kts
+dependencies {
+    implementation("com.justxraf:invitations:0.1.0")
+}
+```
+
+```xml
+<!-- Maven -->
+<dependency>
+  <groupId>com.justxraf</groupId>
+  <artifactId>invitations</artifactId>
+  <version>0.1.0</version>
+</dependency>
+```
+
+The published jar ships source and Javadoc artifacts. The Paper API is `compileOnly`, so plugin
+consumers supply Bukkit/Paper themselves; pure-JVM consumers need nothing extra. See
+[docs/versioning.md](docs/versioning.md) for the semantic-versioning and API-stability policy.
+
 ## Quick start
 
 ```kotlin
@@ -170,8 +194,14 @@ The core package never references Bukkit classes.
   issues, and missed expiry callbacks.
 - [docs/adr-0001-server-free-core.md](docs/adr-0001-server-free-core.md) — why the core has no Bukkit
   dependency.
+- [docs/versioning.md](docs/versioning.md) — semantic-versioning policy and release checklist.
+- [CHANGELOG.md](CHANGELOG.md) — notable changes per release.
 - API reference — `./gradlew dokkaHtml`, then open `build/dokka/html/index.html`.
 
 In-source examples: `demo/Demo.kt`, `examples/KotlinExamples.kt`,
 `src/main/java/com/justxraf/invitations/examples/JavaExamples.java`, and
 `examples/BukkitAdapterExamples.kt`.
+
+## License
+
+Licensed under the [Apache License 2.0](LICENSE). See [NOTICE](NOTICE) for attribution.
