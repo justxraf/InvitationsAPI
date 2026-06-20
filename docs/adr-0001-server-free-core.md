@@ -47,12 +47,3 @@ For now this is enforced by a **package boundary**, not separate Gradle modules:
   builder and the `bukkit/` examples keep this boilerplate to a few lines.
 - A single module means the boundary is convention-enforced (grep/review) rather than compiler-enforced.
   Accepted until publishing, when the split into modules makes it structural.
-
-## Alternatives considered
-
-- **Depend on Bukkit directly in the core.** Simplest call sites, but couples every consumer to a
-  server runtime, blocks non-Bukkit reuse, makes Folia a special case, and makes the engine hard to test
-  without MockBukkit. Rejected.
-- **Split into Gradle modules now.** The right end state, but premature before the artifact coordinates
-  and publishing story are settled; the package boundary already delivers the testability guarantee.
-  Deferred, not rejected.
