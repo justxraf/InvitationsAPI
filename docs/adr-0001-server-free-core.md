@@ -2,8 +2,8 @@
 
 ## Context
 
-InvitationsAPI is the shared invitation engine intended for adoption by IslandCore, SkyblockAPI, and
-future plugins. Invitation flows (party invites, teleport/trade requests, duels, team joins) are mostly
+InvitationsAPI is the shared invitation engine
+Invitation flows (party invites, teleport/trade requests, duels, team joins) are mostly
 platform-independent state machines: register a pending invite, de-duplicate, expire, accept/deny/cancel,
 persist. The only genuinely platform-specific concerns are *threading* (which thread a callback runs on)
 and *event integration* (firing/listening on the Bukkit event bus).
