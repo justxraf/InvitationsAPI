@@ -27,9 +27,7 @@ a **`compileOnly`** dependency — it is needed only to compile those adapters a
 runtime/core API surface.
 
 For now this is enforced by a **package boundary**, not separate Gradle modules: a grep proves no
-`org.bukkit` / `io.papermc` import exists outside `bukkit/` and `examples/`. Promotion to real
-published modules (core / bukkit / folia / persistence) is deferred until the library is published
-(see ROADMAP §5 and §10).
+`org.bukkit` / `io.papermc` import exists outside `bukkit/` and `examples/`.
 
 ## Consequences
 
