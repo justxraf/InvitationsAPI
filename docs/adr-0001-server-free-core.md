@@ -1,13 +1,9 @@
 # ADR 0001 — The core has no Bukkit dependency
 
-- **Status:** Accepted
-- **Date:** 2026-06-19
-- **Deciders:** InvitationsAPI maintainers
-
 ## Context
 
-InvitationsAPI is the shared invitation engine intended for adoption by IslandCore, SkyblockAPI, and
-future plugins. Invitation flows (party invites, teleport/trade requests, duels, team joins) are mostly
+InvitationsAPI is the shared invitation engine
+Invitation flows (party invites, teleport/trade requests, duels, team joins) are mostly
 platform-independent state machines: register a pending invite, de-duplicate, expire, accept/deny/cancel,
 persist. The only genuinely platform-specific concerns are *threading* (which thread a callback runs on)
 and *event integration* (firing/listening on the Bukkit event bus).
@@ -31,9 +27,7 @@ a **`compileOnly`** dependency — it is needed only to compile those adapters a
 runtime/core API surface.
 
 For now this is enforced by a **package boundary**, not separate Gradle modules: a grep proves no
-`org.bukkit` / `io.papermc` import exists outside `bukkit/` and `examples/`. Promotion to real
-published modules (core / bukkit / folia / persistence) is deferred until the library is published
-(see ROADMAP §5 and §10).
+`org.bukkit` / `io.papermc` import exists outside `bukkit/` and `examples/`.
 
 ## Consequences
 
@@ -53,12 +47,3 @@ published modules (core / bukkit / folia / persistence) is deferred until the li
   builder and the `bukkit/` examples keep this boilerplate to a few lines.
 - A single module means the boundary is convention-enforced (grep/review) rather than compiler-enforced.
   Accepted until publishing, when the split into modules makes it structural.
-
-## Alternatives considered
-
-- **Depend on Bukkit directly in the core.** Simplest call sites, but couples every consumer to a
-  server runtime, blocks non-Bukkit reuse, makes Folia a special case, and makes the engine hard to test
-  without MockBukkit. Rejected.
-- **Split into Gradle modules now.** The right end state, but premature before the artifact coordinates
-  and publishing story are settled; the package boundary already delivers the testability guarantee.
-  Deferred, not rejected.
